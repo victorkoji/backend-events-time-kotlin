@@ -1,0 +1,43 @@
+version: '3'
+services:
+  localstack:
+    container_name: localstack
+    image: 'localstack/localstack:latest'
+    ports:
+      - '4566-4576:4566-4576'
+
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+
+  aws_cli_config:
+    container_name: aws_cli_config
+    image: amazon/aws-cli
+    entrypoint: /bin/sh -c
+    depends_on:
+      - localstack
+    command: >
+      '
+          echo "##### STARTED - WAIT 20 SECONDS #####"
+          sleep 20
+
+          echo "########### Creating profile ###########"
+
+          aws configure set aws_access_key_id default_access_key --profile=localstack
+          aws configure set aws_secret_access_key default_secret_key --profile=localstack
+          aws configure set region us-east-1 --profile=localstack
+
+          echo "########### Listing profile ###########"
+          aws configure list --profile=localstack
+
+          echo "########### Creating BUCKET ###########"
+          aws --endpoint-url=http://localstack:4566 s3 mb s3://m7-di-config-local --profile=localstack
+          aws --endpoint-url=http://localstack:4566 s3api put-bucket-acl --bucket m7-di-config-local --acl public-read --profile=localstack
+
+          echo "########### Listing Buckets ###########"
+          aws --endpoint-url=http://localstack:4566 s3 ls --profile=localstack
+      '
+
+networks:
+  m7-network:
+    driver: bridge
