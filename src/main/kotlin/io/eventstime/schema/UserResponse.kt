@@ -1,9 +1,12 @@
-package io.eventstime.model
+package io.eventstime.schema
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.LocalDateTime
 
-class UserResponse(
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class UserResponse(
     val id: Long,
     @JsonProperty("first_name") val firstName: String,
     @JsonProperty("last_name") val lastName: String,

@@ -43,7 +43,6 @@ class WebSecurityConfig(
             UsernamePasswordAuthenticationToken(user, "", listOf(SimpleGrantedAuthority("USER")))
         }
 
-//        http.cors()
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.csrf { it.disable() }
         http.headers { header ->

@@ -1,14 +1,18 @@
 package io.eventstime.controller
 
+import io.eventstime.exception.CustomException
+import io.eventstime.exception.UserErrorType
+import io.eventstime.exception.UserGroupErrorType
 import io.eventstime.mapper.toResponse
-import io.eventstime.model.UserRequest
-import io.eventstime.model.UserResponse
+import io.eventstime.schema.UserRequest
+import io.eventstime.schema.UserResponse
 import io.eventstime.service.UserService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.Authentication
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,57 +22,53 @@ class UserController(
     private val userService: UserService
 ) {
     @GetMapping("/")
-    fun findAllUser(): List<UserResponse> {
-        return try {
-            userService.findAll().toResponse()
-        } catch (e: Exception) {
-            log.warn("Error to create user. Reason: ${e.message}")
-            throw e
-        }
+    fun findAllUser(): List<UserResponse?> {
+        val userList = userService.findAll()
+        return userList.toResponse()
     }
 
     @PostMapping("/")
     fun createUser(@RequestBody user: UserRequest): UserResponse {
-        return try {
-            userService.createUser(user).toResponse()
-        } catch (e: Exception) {
-            log.warn("Error to create user. Reason: ${e.message}")
-            throw e
-        }
+        return userService.createUser(user).toResponse()
     }
 
     @GetMapping("/{userId}")
-    fun findUser(authentication: Authentication, @PathVariable userId: Long): UserResponse? {
-        return try {
-            log.info("Received getUser: $userId")
-            userService.findById(userId).toResponse()
-        } catch (e: Exception) {
-            log.warn("Error to find user. userId: $userId. Reason: ${e.message}")
-            throw e
-        }
+    fun findUser(@PathVariable userId: Long): UserResponse? {
+        val user = userService.findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
+        return user.toResponse()
     }
 
     @PutMapping("/{userId}")
     fun updateUser(@PathVariable userId: Long, @RequestBody user: UserRequest): UserResponse {
-        return try {
-            userService.updateUser(userId, user).toResponse()
-        } catch (e: Exception) {
-            log.warn("Error to create user. Reason: ${e.message}")
-            throw e
-        }
+        return userService.updateUser(userId, user).toResponse()
     }
 
     @DeleteMapping("/{userId}")
     fun deleteUser(@PathVariable userId: Long) {
-        try {
-            userService.deleteUser(userId)
-        } catch (e: Exception) {
-            log.warn("Error to delete user. Reason: ${e.message}")
-            throw e
+        userService.deleteUser(userId)
+    }
+
+    @ExceptionHandler
+    fun handleException(e: Exception): ResponseStatusException = when (e) {
+        is CustomException ->
+            ResponseStatusException(
+                when (e.message) {
+                    UserErrorType.EMAIL_ALREADY_EXIST.name -> HttpStatus.CONFLICT
+                    UserErrorType.USER_NOT_FOUND.name, UserGroupErrorType.GROUP_NOT_FOUND.name -> HttpStatus.NOT_FOUND
+                    else -> HttpStatus.BAD_REQUEST
+                },
+                e.message.toString()
+            )
+        else -> {
+            log.warn(e.message.toString())
+            ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.name
+            )
         }
     }
 
     companion object {
-        val log = LoggerFactory.getLogger(UserController::class.java)!!
+        private val log = LoggerFactory.getLogger(UserController::class.java)!!
     }
 }

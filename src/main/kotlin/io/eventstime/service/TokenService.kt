@@ -1,5 +1,8 @@
 package io.eventstime.service
 
+import io.eventstime.exception.CustomException
+import io.eventstime.exception.UserErrorType
+import io.eventstime.model.UserAuth
 import io.eventstime.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -57,15 +60,25 @@ class TokenService(
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plus(refreshTokenExpireDays, ChronoUnit.DAYS))
             .subject(user.email)
+            .claim("userId", user.id)
             .build()
         return jwtEncoderRefreshToken.encode(JwtEncoderParameters.from(jwsHeader, claims)).tokenValue
     }
 
-    fun parseAccessToken(token: String): User? {
+    fun parseAccessToken(token: String): UserAuth? {
         return try {
             val jwt = jwtDecoderAccessToken.decode(token)
             val userId = jwt.claims["userId"] as Long
-            userService.findById(userId)
+            val user = userService.findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
+
+            UserAuth(
+                id = user.id!!,
+                firstName = user.firstName,
+                lastName = user.lastName,
+                email = user.email,
+                tokenFcm = user.tokenFcm,
+                userGroupId = user.userGroup!!.id
+            )
         } catch (e: Exception) {
             null
         }
@@ -75,7 +88,8 @@ class TokenService(
         return try {
             val jwt = jwtDecoderRefreshToken.decode(token)
             val userId = jwt.claims["userId"] as Long
-            userService.findById(userId)
+
+            return userService.findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
         } catch (e: Exception) {
             null
         }

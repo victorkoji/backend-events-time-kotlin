@@ -62,6 +62,10 @@ spring:
     database-change-log-table: liq_db_changelog
     database-change-log-lock-table: liq_db_changelog_lock
 
+server:
+  error:
+    include-message: always
+
 jwt:
   access-token:
     secret-key: ======================access=token=spring===========================

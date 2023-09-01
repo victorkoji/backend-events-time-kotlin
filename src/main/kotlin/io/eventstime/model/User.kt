@@ -11,11 +11,15 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import jakarta.persistence.Temporal
 import jakarta.persistence.TemporalType
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import java.util.Date
 
 @Entity
 @Table(name = "users", schema = "public")
+@SQLDelete(sql = "UPDATE users SET deleted_at=NOW() WHERE id = ?")
+@Where(clause = "deleted_at is NULL")
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

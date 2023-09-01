@@ -46,6 +46,7 @@ dependencies {
 		exclude(module = "mockito-junit-jupiter")
 	}
 	testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlinter {

@@ -1,10 +1,12 @@
 package io.eventstime.service
 
+import io.eventstime.exception.CustomException
+import io.eventstime.exception.UserErrorType
+import io.eventstime.exception.UserGroupErrorType
 import io.eventstime.model.User
-import io.eventstime.model.UserRequest
+import io.eventstime.schema.UserRequest
 import io.eventstime.repository.UserRepository
 import io.eventstime.utils.HashUtils
-import io.eventstime.utils.modelMapperUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
@@ -13,23 +15,27 @@ import java.util.*
 class UserService(
     private val userGroupService: UserGroupService,
     private val userRepository: UserRepository,
-    private val modelMapperUtils: modelMapperUtils,
     private val hashUtils: HashUtils
 ) {
-    fun findAll(): List<User> {
+    fun findAll(): List<User?> {
         return userRepository.findAll()
     }
 
-    fun findById(userId: Long): User {
-        return userRepository.findByIdOrNull(userId) ?: throw Exception("Not found")
+    fun findById(userId: Long): User? {
+        return userRepository.findByIdOrNull(userId)
     }
 
-    fun findByEmail(email: String): User {
+    fun findByEmail(email: String): User? {
         return userRepository.findByEmail(email)
+    }
+
+    fun existUserByEmail(email: String): Boolean {
+        return userRepository.existsByEmail(email)
     }
 
     fun createUser(user: UserRequest): User {
         val userGroup = userGroupService.findById(user.userGroupId)
+            ?: throw CustomException(UserGroupErrorType.GROUP_NOT_FOUND)
 
         return userRepository.save(
             User(
@@ -49,7 +55,9 @@ class UserService(
 
     fun updateUser(userId: Long, newUser: UserRequest): User {
         val userGroup = userGroupService.findById(newUser.userGroupId)
-        val user = findById(userId)
+            ?: throw CustomException(UserGroupErrorType.GROUP_NOT_FOUND)
+
+        val user = findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
 
         val updatedUser = user.copy(
             id = userId,
@@ -66,7 +74,7 @@ class UserService(
     }
 
     fun deleteUser(userId: Long) {
-        val user = userRepository.findById(userId).orElseThrow { Exception("Not found") }
+        val user = findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
         val deletedUser = user.copy(deletedAt = Date())
         userRepository.save(deletedUser)
     }

@@ -8,7 +8,15 @@ import org.springframework.web.servlet.view.RedirectView
 @Controller
 class HomeController {
     @GetMapping("/swagger-ui")
-    fun redirectToDocs(): RedirectView {
+    fun redirectToSwagger(): RedirectView {
+        val redirectView = RedirectView()
+        redirectView.url = "/swagger-ui.html"
+        redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY)
+        return redirectView
+    }
+
+    @GetMapping("/docs")
+    fun redirectToSwaggerByDocs(): RedirectView {
         val redirectView = RedirectView()
         redirectView.url = "/swagger-ui.html"
         redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY)
