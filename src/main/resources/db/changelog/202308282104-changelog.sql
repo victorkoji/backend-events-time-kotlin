@@ -72,6 +72,16 @@ CREATE TABLE public.users (
 --  CONSTRAINT user_roles_role_id_foreign FOREIGN KEY (role_id) REFERENCES public.roles(id)
 --);
 
+CREATE TABLE public.user_tokens (
+	id serial4 NOT NULL,
+	app_client varchar(50) NOT NULL,
+	user_id int4 NOT NULL,
+	token_fcm varchar(255) NULL,
+	refresh_token varchar(255) NULL,
+	CONSTRAINT user_tokens_pkey PRIMARY KEY (id),
+	CONSTRAINT user_tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+
 CREATE TABLE public.events (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
