@@ -12,25 +12,20 @@ class UserTokenService(
 ) {
 
     fun updateRefreshToken(user: User, appClient: AppClient, refreshToken: String) {
-        val userToken: UserToken? = userTokenRepository.findByUserAndAppClient(user, appClient)
-
-        if (userToken == null) {
-            userTokenRepository.save(
-                UserToken(
-                    user = user,
-                    refreshToken = refreshToken,
-                    appClient = appClient
-                )
+        userTokenRepository.findByUserAndAppClient(user, appClient)?.let { userToken ->
+            userTokenRepository.save(userToken.copy(refreshToken = refreshToken))
+        } ?: userTokenRepository.save(
+            UserToken(
+                user = user,
+                refreshToken = refreshToken,
+                appClient = appClient
             )
-            return
-        }
-
-        userTokenRepository.save(userToken.copy(refreshToken = refreshToken))
+        )
     }
 
     fun validateRefreshToken(user: User, appClient: AppClient, refreshToken: String): Boolean {
-        val userToken: UserToken = userTokenRepository.findByUserAndAppClient(user, appClient) ?: return false
-
-        return userToken.refreshToken == refreshToken
+        return userTokenRepository.findByUserAndAppClient(user, appClient)?.let { userToken ->
+            userToken.refreshToken == refreshToken
+        } ?: false
     }
 }
