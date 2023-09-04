@@ -4,10 +4,7 @@ import io.eventstime.auth.AuthorizationService
 import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
-import io.eventstime.model.AppClient
-import io.eventstime.model.User
-import io.eventstime.model.UserAuth
-import io.eventstime.model.UserGroup
+import io.eventstime.model.*
 import io.eventstime.schema.LoginRequest
 import io.eventstime.schema.RefreshTokenRequest
 import io.eventstime.schema.UserRequest
@@ -47,6 +44,14 @@ class AuthControllerTest {
         cellphone = "",
         password = "1234",
         userGroup = UserGroup(id = 1, name = "admin")
+    )
+
+    private val userToken = UserToken(
+        id = 1,
+        refreshToken = "refresh_token",
+        tokenFcm = null,
+        appClient = AppClient.CLIENT,
+        user = user
     )
 
     private val userAuth = UserAuth(
@@ -134,6 +139,75 @@ class AuthControllerTest {
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
             verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+        }
+
+        @Test
+        fun `Login throw exception APP_CLIENT_UNDEFINED`() {
+            // GIVEN
+            val payload = LoginRequest(
+                email = user.email,
+                password = user.password,
+                appClient = "INVALID"
+            )
+
+            // WHEN
+            val exception = assertThrows<CustomException> {
+                testObject.login(payload)
+            }
+
+            // THEN
+            assertEquals(AuthErrorType.APP_CLIENT_UNDEFINED.name, exception.message)
+
+            verify(exactly = 0) { userService.findByEmail(payload.email) }
+            verify(exactly = 0) { authService.checkIsValidPassword(payload.password, user.password) }
+            verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
+            verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+        }
+
+        @Test
+        fun `Login throw exception on update refreshToken`() {
+            // GIVEN
+            val payload = LoginRequest(
+                email = user.email,
+                password = user.password,
+                appClient = appClientName
+            )
+
+            every {
+                userService.findByEmail(payload.email)
+            } returns user
+
+            every {
+                authService.checkIsValidPassword(payload.password, user.password)
+            } returns true
+
+            every {
+                tokenService.createAccessToken(user, AppClient.CLIENT)
+            } returns "access_token"
+
+            every {
+                tokenService.createRefreshToken(user, AppClient.CLIENT)
+            } returns "refresh_token"
+
+            every {
+                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+            } throws Exception()
+
+            // WHEN
+            val exception = assertThrows<CustomException> {
+                testObject.login(payload)
+            }
+
+            // THEN
+            assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
+
+            verify(exactly = 1) { userService.findByEmail(payload.email) }
+            verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
+            verify(exactly = 1) { tokenService.createAccessToken(any(), any()) }
+            verify(exactly = 1) { tokenService.createRefreshToken(any(), any()) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
         }
     }
 
@@ -265,7 +339,7 @@ class AuthControllerTest {
 
             every {
                 userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
-            } just runs
+            }  just runs
 
             // WHEN
             assertDoesNotThrow {
@@ -274,8 +348,10 @@ class AuthControllerTest {
 
             // THEN
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
             verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
             verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
         }
 
         @Test
@@ -293,8 +369,72 @@ class AuthControllerTest {
             // THEN
             assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
             verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+        }
+
+        @Test
+        fun `Refresh token throw exception on validate refreshToken`() {
+            // GIVEN
+            every {
+                tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
+            } returns Pair(user, AppClient.CLIENT)
+
+            every {
+                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+            } returns false
+
+            // WHEN
+            val exception = assertThrows<CustomException> {
+                testObject.refreshToken(refreshTokenRequest)
+            }
+
+            // THEN
+            assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
+            verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { tokenService.createAccessToken(user, AppClient.CLIENT) }
+            verify(exactly = 0) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+        }
+
+        @Test
+        fun `Refresh token throw exception on update refreshToken`() {
+            // GIVEN
+            every {
+                tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
+            } returns Pair(user, AppClient.CLIENT)
+
+            every {
+                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+            } returns true
+
+            every {
+                tokenService.createAccessToken(user, AppClient.CLIENT)
+            } returns "access_token"
+
+            every {
+                tokenService.createRefreshToken(user, AppClient.CLIENT)
+            } returns "refresh_token"
+
+            every {
+                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+            } throws Exception()
+
+            // WHEN
+            val exception = assertThrows<CustomException> {
+                testObject.refreshToken(refreshTokenRequest)
+            }
+
+            // THEN
+            assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
+            verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { tokenService.createAccessToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
         }
     }
 

@@ -32,7 +32,7 @@ class AuthController(
         AppClient.values().any { appClient ->
             appClient.name == payload.appClient
         }.let { exists ->
-            if (!exists) throw CustomException(AuthErrorType.LOGIN_FAILED)
+            if (!exists) throw CustomException(AuthErrorType.APP_CLIENT_UNDEFINED)
         }
 
         val user = userService.findByEmail(payload.email) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
@@ -45,7 +45,11 @@ class AuthController(
         val accessToken = tokenService.createAccessToken(user, appClient)
         val refreshToken = tokenService.createRefreshToken(user, appClient)
 
-        userTokenService.updateRefreshToken(user, appClient, refreshToken)
+        try {
+            userTokenService.updateRefreshToken(user, appClient, refreshToken)
+        } catch (e: Exception) {
+            throw CustomException(AuthErrorType.UNAUTHORIZED)
+        }
 
         return AuthResponse(
             accessToken,
@@ -76,7 +80,12 @@ class AuthController(
         if (!userTokenService.validateRefreshToken(user!!, appClient, payload.refreshToken)) throw CustomException(AuthErrorType.UNAUTHORIZED)
 
         val refreshToken = tokenService.createRefreshToken(user, appClient)
-        userTokenService.updateRefreshToken(user, appClient, refreshToken)
+
+        try  {
+            userTokenService.updateRefreshToken(user, appClient, refreshToken)
+        } catch (e: Exception) {
+            throw CustomException(AuthErrorType.UNAUTHORIZED)
+        }
 
         return AuthResponse(
             tokenService.createAccessToken(user, appClient),
