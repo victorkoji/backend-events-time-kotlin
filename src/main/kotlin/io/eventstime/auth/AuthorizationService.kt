@@ -6,7 +6,6 @@ import io.eventstime.model.UserAuth
 import io.eventstime.utils.HashUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AuthorizationService(
@@ -23,7 +22,6 @@ class AuthorizationService(
                     firstName = userToken.firstName,
                     lastName = userToken.lastName,
                     email = userToken.email,
-                    tokenFcm = userToken.tokenFcm,
                     userGroupId = userToken.userGroupId
                 )
 

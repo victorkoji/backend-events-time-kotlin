@@ -47,7 +47,6 @@ CREATE TABLE public.users (
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NULL,
 	email varchar(255) NULL,
-	token_fcm varchar(255) NULL,
 	birth_date date NULL,
 	cellphone varchar(255) NULL,
 	"password" varchar(255) NOT NULL,
@@ -71,6 +70,16 @@ CREATE TABLE public.users (
 --  CONSTRAINT user_roles_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id),
 --  CONSTRAINT user_roles_role_id_foreign FOREIGN KEY (role_id) REFERENCES public.roles(id)
 --);
+
+CREATE TABLE public.user_tokens (
+	id serial4 NOT NULL,
+	app_client varchar(50) NOT NULL,
+	user_id int4 NOT NULL,
+	token_fcm varchar(255) NULL,
+	refresh_token varchar(255) NULL,
+	CONSTRAINT user_tokens_pkey PRIMARY KEY (id),
+	CONSTRAINT user_tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 
 CREATE TABLE public.events (
 	id serial4 NOT NULL,
@@ -280,5 +289,3 @@ CREATE TABLE public.vouchers (
 	CONSTRAINT vouchers_status_voucher_id_foreign FOREIGN KEY (status_voucher_id) REFERENCES public.status_vouchers(id),
 	CONSTRAINT vouchers_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.users(id)
 );
-
-//

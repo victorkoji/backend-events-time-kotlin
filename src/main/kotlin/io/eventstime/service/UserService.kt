@@ -45,7 +45,6 @@ class UserService(
                 email = user.email,
                 cellphone = user.cellphone,
                 password = hashUtils.createHashBcrypt(user.password),
-                tokenFcm = "",
                 userGroup = userGroup,
                 createdAt = Date(),
                 updatedAt = Date()

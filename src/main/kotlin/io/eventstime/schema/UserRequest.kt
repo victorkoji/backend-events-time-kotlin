@@ -10,6 +10,5 @@ class UserRequest(
     val email: String,
     val cellphone: String,
     val password: String,
-    @JsonProperty("token_fcm") val tokenFcm: String?,
     @JsonProperty("user_group_id") val userGroupId: Long
 )

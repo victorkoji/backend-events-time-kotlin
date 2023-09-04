@@ -34,7 +34,6 @@ class UserControllerTest {
         email = "test@test.com",
         cellphone = "",
         password = "1234",
-        tokenFcm = "",
         userGroup = UserGroup(id = 1, name = "admin")
     )
 
@@ -78,7 +77,6 @@ class UserControllerTest {
             email = "test@test.com",
             cellphone = "61213123",
             password = "password",
-            tokenFcm = null,
             userGroupId = 1
         )
 
@@ -105,7 +103,6 @@ class UserControllerTest {
             email = "test@test.com",
             cellphone = "61213123",
             password = "password",
-            tokenFcm = null,
             userGroupId = 1
         )
 

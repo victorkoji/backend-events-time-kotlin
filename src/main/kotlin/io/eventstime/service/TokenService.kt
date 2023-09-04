@@ -2,6 +2,7 @@ package io.eventstime.service
 
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
+import io.eventstime.model.AppClient
 import io.eventstime.model.UserAuth
 import io.eventstime.model.User
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,7 +43,7 @@ class TokenService(
     @Value("\${jwt.refresh-token.expiration-time-days}")
     private val refreshTokenExpireDays: Long
 ) {
-    fun createAccessToken(user: User): String {
+    fun createAccessToken(user: User, appClient: AppClient): String {
         val jwsHeader = JwsHeader.with { "HS256" }.build()
         val claims = JwtClaimsSet.builder()
             .issuedAt(Instant.now())
@@ -50,18 +51,21 @@ class TokenService(
             .subject(user.email)
             .claim("userId", user.id)
             .claim("groupId", user.userGroup)
+            .claim("appClient", appClient.name)
             .build()
         return jwtEncoderAccessToken.encode(JwtEncoderParameters.from(jwsHeader, claims)).tokenValue
     }
 
-    fun createRefreshToken(user: User): String {
+    fun createRefreshToken(user: User, appClient: AppClient): String {
         val jwsHeader = JwsHeader.with { "HS256" }.build()
         val claims = JwtClaimsSet.builder()
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plus(refreshTokenExpireDays, ChronoUnit.DAYS))
             .subject(user.email)
             .claim("userId", user.id)
+            .claim("appClient", appClient.name)
             .build()
+
         return jwtEncoderRefreshToken.encode(JwtEncoderParameters.from(jwsHeader, claims)).tokenValue
     }
 
@@ -76,7 +80,6 @@ class TokenService(
                 firstName = user.firstName,
                 lastName = user.lastName,
                 email = user.email,
-                tokenFcm = user.tokenFcm,
                 userGroupId = user.userGroup!!.id
             )
         } catch (e: Exception) {
@@ -84,12 +87,13 @@ class TokenService(
         }
     }
 
-    fun parseRefreshToken(token: String): User? {
+    fun parseRefreshToken(token: String): Pair<User?, AppClient>? {
         return try {
             val jwt = jwtDecoderRefreshToken.decode(token)
             val userId = jwt.claims["userId"] as Long
+            val appClient = AppClient.valueOf(jwt.claims["appClient"] as String)
 
-            return userService.findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
+            Pair(userService.findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND), appClient)
         } catch (e: Exception) {
             null
         }

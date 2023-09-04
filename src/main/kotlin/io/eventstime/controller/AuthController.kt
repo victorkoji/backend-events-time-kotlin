@@ -5,9 +5,11 @@ import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
 import io.eventstime.mapper.toResponse
+import io.eventstime.model.AppClient
 import io.eventstime.schema.*
 import io.eventstime.service.TokenService
 import io.eventstime.service.UserService
+import io.eventstime.service.UserTokenService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
@@ -21,20 +23,35 @@ import org.springframework.web.server.ResponseStatusException
 @Tag(name = "Auth")
 class AuthController(
     private val tokenService: TokenService,
+    private val userTokenService: UserTokenService,
     private val authService: AuthorizationService,
     private val userService: UserService
 ) {
     @PostMapping("/login")
     fun login(@RequestBody payload: LoginRequest): AuthResponse {
+        if (AppClient.values().none { it.name == payload.appClient }) {
+            throw CustomException(AuthErrorType.APP_CLIENT_UNDEFINED)
+        }
+
         val user = userService.findByEmail(payload.email) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
 
         if (!authService.checkIsValidPassword(payload.password, user.password)) {
             throw CustomException(AuthErrorType.LOGIN_FAILED)
         }
 
+        val appClient: AppClient = AppClient.valueOf(payload.appClient)
+        val accessToken = tokenService.createAccessToken(user, appClient)
+        val refreshToken = tokenService.createRefreshToken(user, appClient)
+
+        try {
+            userTokenService.updateRefreshToken(user, appClient, refreshToken)
+        } catch (e: Exception) {
+            throw CustomException(AuthErrorType.UNAUTHORIZED)
+        }
+
         return AuthResponse(
-            accessToken = tokenService.createAccessToken(user),
-            refreshToken = tokenService.createRefreshToken(user)
+            accessToken,
+            refreshToken
         )
     }
 
@@ -56,11 +73,23 @@ class AuthController(
 
     @PostMapping("/refresh-token")
     fun refreshToken(@RequestBody payload: RefreshTokenRequest): AuthResponse {
-        val user = tokenService.parseRefreshToken(payload.refreshToken) ?: throw CustomException(AuthErrorType.UNAUTHORIZED)
+        val (user, appClient) = tokenService.parseRefreshToken(payload.refreshToken) ?: throw CustomException(AuthErrorType.UNAUTHORIZED)
+
+        if (!userTokenService.validateRefreshToken(user!!, appClient, payload.refreshToken)) throw CustomException(AuthErrorType.UNAUTHORIZED)
+
+        val refreshToken = tokenService.createRefreshToken(user, appClient)
+
+        try {
+            userTokenService.updateRefreshToken(user, appClient, refreshToken)
+        } catch (e: Exception) {
+            throw CustomException(AuthErrorType.UNAUTHORIZED)
+        }
+
+        val accessToken = tokenService.createAccessToken(user, appClient)
 
         return AuthResponse(
-            accessToken = tokenService.createAccessToken(user),
-            refreshToken = tokenService.createRefreshToken(user)
+            accessToken,
+            refreshToken
         )
     }
 
