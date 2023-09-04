@@ -45,14 +45,14 @@ class UserTokenServiceTest {
     )
 
     @Test
-    fun `Update refresh token with success`() {
+    fun `Update refresh token with success on token exists`() {
         // GIVEN
         every {
             userTokenRepository.findByUserAndAppClient(any(), any())
         } returns userToken
 
         every {
-            userTokenRepository.save(any())
+            userTokenRepository.save(userToken.copy(refreshToken = refreshToken))
         } returns userTokenMock
 
         // WHEN
@@ -60,7 +60,40 @@ class UserTokenServiceTest {
 
         // THEN
         verify(exactly = 1) { userTokenRepository.findByUserAndAppClient(user, appClient) }
-        verify(exactly = 1) { userTokenRepository.save(any()) }
+        verify(exactly = 1) { userTokenRepository.save(userToken.copy(refreshToken = refreshToken)) }
+    }
+
+    @Test
+    fun `Update refresh token with success on token not exists`() {
+        // GIVEN
+        every {
+            userTokenRepository.findByUserAndAppClient(any(), any())
+        } returns null
+
+        every {
+            userTokenRepository.save(
+                UserToken(
+                    user = user,
+                    refreshToken = refreshToken,
+                    appClient = appClient
+                )
+            )
+        } returns userTokenMock
+
+        // WHEN
+        testObject.updateRefreshToken(user, appClient, refreshToken)
+
+        // THEN
+        verify(exactly = 1) { userTokenRepository.findByUserAndAppClient(user, appClient) }
+        verify(exactly = 1) {
+            userTokenRepository.save(
+                UserToken(
+                    user = user,
+                    refreshToken = refreshToken,
+                    appClient = appClient
+                )
+            )
+        }
     }
 
     @Test
@@ -71,7 +104,7 @@ class UserTokenServiceTest {
         } returns userToken
 
         every {
-            userTokenRepository.save(any())
+            userTokenRepository.save(userToken.copy(refreshToken = refreshToken))
         } throws Exception()
 
         // WHEN
@@ -82,7 +115,7 @@ class UserTokenServiceTest {
         // THEN
         assertEquals(Exception().message, exception.message)
         verify(exactly = 1) { userTokenRepository.findByUserAndAppClient(user, appClient) }
-        verify(exactly = 1) { userTokenRepository.save(any()) }
+        verify(exactly = 1) { userTokenRepository.save(userToken.copy(refreshToken = refreshToken)) }
     }
 
     @Test
@@ -93,7 +126,13 @@ class UserTokenServiceTest {
         } returns null
 
         every {
-            userTokenRepository.save(any())
+            userTokenRepository.save(
+                UserToken(
+                    user = user,
+                    refreshToken = refreshToken,
+                    appClient = appClient
+                )
+            )
         } throws Exception()
 
         // WHEN
@@ -104,6 +143,14 @@ class UserTokenServiceTest {
         // THEN
         assertEquals(Exception().message, exception.message)
         verify(exactly = 1) { userTokenRepository.findByUserAndAppClient(user, appClient) }
-        verify(exactly = 1) { userTokenRepository.save(any()) }
+        verify(exactly = 1) {
+            userTokenRepository.save(
+                UserToken(
+                    user = user,
+                    refreshToken = refreshToken,
+                    appClient = appClient
+                )
+            )
+        }
     }
 }
