@@ -23,7 +23,6 @@ class AuthorizationService(
                     firstName = userToken.firstName,
                     lastName = userToken.lastName,
                     email = userToken.email,
-                    tokenFcm = userToken.tokenFcm,
                     userGroupId = userToken.userGroupId
                 )
 

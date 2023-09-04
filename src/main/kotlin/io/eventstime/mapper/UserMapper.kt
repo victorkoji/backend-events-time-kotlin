@@ -10,7 +10,6 @@ fun User.toResponse() = UserResponse(
     birthDate = birthDate,
     email = email,
     cellphone = cellphone,
-    tokenFcm = tokenFcm,
     userGroupId = userGroup!!.id
 )
 
@@ -26,7 +25,6 @@ fun List<User?>.toResponse(): List<UserResponse> {
                 birthDate = user.birthDate,
                 email = user.email,
                 cellphone = user.cellphone,
-                tokenFcm = user.tokenFcm,
                 userGroupId = user.userGroup!!.id
             )
         }

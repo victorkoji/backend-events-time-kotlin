@@ -43,7 +43,6 @@ class AuthControllerTest {
         email = "test@test.com",
         cellphone = "",
         password = "1234",
-        tokenFcm = "",
         userGroup = UserGroup(id = 1, name = "admin")
     )
 
@@ -52,7 +51,6 @@ class AuthControllerTest {
         firstName = "test",
         lastName = "test",
         email = "test@test.com",
-        tokenFcm = "",
         userGroupId = 1
     )
 
@@ -151,7 +149,6 @@ class AuthControllerTest {
             assertEquals(userAuth.firstName, result.firstName)
             assertEquals(userAuth.lastName, result.lastName)
             assertEquals(userAuth.email, result.email)
-            assertEquals(userAuth.tokenFcm, result.tokenFcm)
             assertEquals(userAuth.userGroupId, result.userGroupId)
 
             verify(exactly = 1) { authService.getUser() }
@@ -186,7 +183,6 @@ class AuthControllerTest {
             email = "test@test.com",
             cellphone = "",
             password = "1234",
-            tokenFcm = "",
             userGroupId = 1
         )
 

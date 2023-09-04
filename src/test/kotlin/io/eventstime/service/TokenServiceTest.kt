@@ -40,7 +40,6 @@ class TokenServiceTest {
         email = "test@test.com",
         cellphone = "",
         password = "1234",
-        tokenFcm = "",
         userGroup = UserGroup(id = 1, name = "admin")
     )
 
@@ -127,7 +126,7 @@ class TokenServiceTest {
 
         // THEN
         assertEquals(
-            UserAuth(id = 1, firstName = "test", lastName = "test", email = "test@test.com", tokenFcm = "", userGroupId = 1),
+            UserAuth(id = 1, firstName = "test", lastName = "test", email = "test@test.com", userGroupId = 1),
             result
         )
         verify(exactly = 1) { userService.findById(1) }

@@ -47,7 +47,6 @@ CREATE TABLE public.users (
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NULL,
 	email varchar(255) NULL,
-	token_fcm varchar(255) NULL,
 	birth_date date NULL,
 	cellphone varchar(255) NULL,
 	"password" varchar(255) NOT NULL,

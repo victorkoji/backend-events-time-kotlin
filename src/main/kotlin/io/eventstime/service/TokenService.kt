@@ -80,7 +80,6 @@ class TokenService(
                 firstName = user.firstName,
                 lastName = user.lastName,
                 email = user.email,
-                tokenFcm = user.tokenFcm,
                 userGroupId = user.userGroup!!.id
             )
         } catch (e: Exception) {

@@ -5,6 +5,5 @@ data class UserAuth(
     val firstName: String?,
     val lastName: String?,
     val email: String,
-    val tokenFcm: String?,
     val userGroupId: Long
 )
