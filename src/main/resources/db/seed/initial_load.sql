@@ -3,8 +3,8 @@ INSERT INTO public.user_groups (id, "name",created_at,updated_at,deleted_at) VAL
 	(2, 'Clients','2023-08-07 20:23:10.273036','2023-08-07 20:23:10.273036',NULL);
 ALTER SEQUENCE user_groups_id_seq RESTART WITH 3;
 
-INSERT INTO public.users (id, first_name,last_name,email,token_fcm,birth_date,cellphone,"password",user_group_id,user_created,user_modified,created_at,updated_at,deleted_at) VALUES
-	(1, 'admin','','admin@admin.com',NULL,'2023-07-10','','$2b$12$FqYd6qWfqNZksbp5nVwjmu3UmbP2gPc55oF2FFalnx4kgX/8tKaiK',1,NULL,NULL,'2023-08-07 20:23:10.275763','2023-08-07 20:23:10.275763',NULL);
+INSERT INTO public.users (id, first_name,last_name,email,birth_date,cellphone,"password",user_group_id,user_created,user_modified,created_at,updated_at,deleted_at) VALUES
+	(1, 'admin','','admin@admin.com','2023-07-10','','$2b$12$FqYd6qWfqNZksbp5nVwjmu3UmbP2gPc55oF2FFalnx4kgX/8tKaiK',1,NULL,NULL,'2023-08-07 20:23:10.275763','2023-08-07 20:23:10.275763',NULL);
 ALTER SEQUENCE users_id_seq RESTART WITH 2;
 
 INSERT INTO public.events (id, "name",programmed_date_initial,programmed_date_final,address,is_public,user_created,user_modified,created_at,updated_at,deleted_at) VALUES

@@ -1,5 +1,6 @@
 package io.eventstime.service
 
+import io.eventstime.model.AppClient
 import io.eventstime.model.User
 import io.eventstime.model.UserAuth
 import io.eventstime.model.UserGroup
@@ -32,6 +33,8 @@ class TokenServiceTest {
     private val accessTokenExpireSeconds: Long = 10
     private val refreshTokenExpireDays: Long = 1
 
+    private val appClientName = AppClient.CLIENT.name
+
     private val user = User(
         id = 1,
         firstName = "test",
@@ -53,6 +56,7 @@ class TokenServiceTest {
             .subject(user.email)
             .claim("userId", user.id)
             .claim("groupId", user.userGroup)
+            .claim("appClient", appClientName)
             .build()
 
         every {
@@ -66,7 +70,7 @@ class TokenServiceTest {
         } returns "teste"
 
         // WHEN
-        val result = testObject.createAccessToken(user)
+        val result = testObject.createAccessToken(user, AppClient.CLIENT)
 
         // THEN
         assertEquals(jwt.tokenValue, result)
@@ -81,6 +85,7 @@ class TokenServiceTest {
             .expiresAt(Instant.now().plus(refreshTokenExpireDays, ChronoUnit.DAYS))
             .subject(user.email)
             .claim("userId", user.id)
+            .claim("appClient", appClientName)
             .build()
 
         every {
@@ -94,7 +99,7 @@ class TokenServiceTest {
         } returns "teste"
 
         // WHEN
-        val result = testObject.createRefreshToken(user)
+        val result = testObject.createRefreshToken(user, AppClient.CLIENT)
 
         // THEN
         assertEquals(jwt.tokenValue, result)
@@ -167,6 +172,10 @@ class TokenServiceTest {
         } returns user.id!!
 
         every {
+            jwtDecoderRefreshToken.decode(token).claims["appClient"]
+        } returns appClientName
+
+        every {
             userService.findById(user.id!!)
         } returns user
 
@@ -174,7 +183,7 @@ class TokenServiceTest {
         val result = testObject.parseRefreshToken(token)
 
         // THEN
-        assertEquals(user, result)
+        assertEquals(Pair(user, AppClient.CLIENT), result)
         verify(exactly = 1) { userService.findById(user.id!!) }
     }
 

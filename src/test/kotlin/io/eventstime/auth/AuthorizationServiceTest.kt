@@ -25,7 +25,7 @@ class AuthorizationServiceTest {
 
     private val hashUtils = mockk<HashUtils>()
 
-    private val user = UserAuth(1, "firstName", "lastName", "email@teste.com", "", 1)
+    private val user = UserAuth(1, "firstName", "lastName", "email@teste.com", 1)
 
     private fun setUserToken() {
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(

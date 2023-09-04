@@ -4,6 +4,7 @@ import io.eventstime.auth.AuthorizationService
 import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
+import io.eventstime.model.AppClient
 import io.eventstime.model.User
 import io.eventstime.model.UserAuth
 import io.eventstime.model.UserGroup
@@ -12,11 +13,10 @@ import io.eventstime.schema.RefreshTokenRequest
 import io.eventstime.schema.UserRequest
 import io.eventstime.service.TokenService
 import io.eventstime.service.UserService
-import io.mockk.every
+import io.eventstime.service.UserTokenService
+import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -32,8 +32,11 @@ class AuthControllerTest {
     lateinit var testObject: AuthController
 
     private val tokenService = mockk<TokenService>()
+    private val userTokenService = mockk<UserTokenService>()
     private val authService = mockk<AuthorizationService>()
     private val userService = mockk<UserService>()
+
+    private val appClientName = AppClient.CLIENT.name
 
     private val user = User(
         id = 1,
@@ -61,7 +64,8 @@ class AuthControllerTest {
             // GIVEN
             val payload = LoginRequest(
                 email = user.email,
-                password = user.password
+                password = user.password,
+                appClient = appClientName
             )
 
             every {
@@ -73,12 +77,16 @@ class AuthControllerTest {
             } returns true
 
             every {
-                tokenService.createAccessToken(user)
+                tokenService.createAccessToken(user, AppClient.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user)
+                tokenService.createRefreshToken(user, AppClient.CLIENT)
             } returns "refresh_token"
+
+            every {
+                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+            } just runs
 
             // WHEN
             val result = assertDoesNotThrow {
@@ -91,8 +99,10 @@ class AuthControllerTest {
 
             verify(exactly = 1) { userService.findByEmail(payload.email) }
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
-            verify(exactly = 1) { tokenService.createAccessToken(user) }
-            verify(exactly = 1) { tokenService.createRefreshToken(user) }
+            verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+
         }
 
         @Test
@@ -100,7 +110,8 @@ class AuthControllerTest {
             // GIVEN
             val payload = LoginRequest(
                 email = user.email,
-                password = user.password
+                password = user.password,
+                appClient = appClientName
             )
 
             every {
@@ -121,8 +132,8 @@ class AuthControllerTest {
 
             verify(exactly = 1) { userService.findByEmail(payload.email) }
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
-            verify(exactly = 0) { tokenService.createAccessToken(any()) }
-            verify(exactly = 0) { tokenService.createRefreshToken(any()) }
+            verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
+            verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
         }
     }
 
@@ -238,15 +249,23 @@ class AuthControllerTest {
             // GIVEN
             every {
                 tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
-            } returns user
+            } returns Pair(user, AppClient.CLIENT)
 
             every {
-                tokenService.createAccessToken(user)
+                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+            } returns true
+
+            every {
+                tokenService.createAccessToken(user, AppClient.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user)
+                tokenService.createRefreshToken(user, AppClient.CLIENT)
             } returns "refresh_token"
+
+            every {
+                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+            } just runs
 
             // WHEN
             assertDoesNotThrow {
@@ -255,8 +274,8 @@ class AuthControllerTest {
 
             // THEN
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 1) { tokenService.createAccessToken(user) }
-            verify(exactly = 1) { tokenService.createRefreshToken(user) }
+            verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
         }
 
         @Test
@@ -274,8 +293,8 @@ class AuthControllerTest {
             // THEN
             assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 0) { tokenService.createAccessToken(any()) }
-            verify(exactly = 0) { tokenService.createRefreshToken(any()) }
+            verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
+            verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
         }
     }
 

@@ -289,5 +289,3 @@ CREATE TABLE public.vouchers (
 	CONSTRAINT vouchers_status_voucher_id_foreign FOREIGN KEY (status_voucher_id) REFERENCES public.status_vouchers(id),
 	CONSTRAINT vouchers_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.users(id)
 );
-
-//
