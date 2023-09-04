@@ -107,7 +107,6 @@ class AuthControllerTest {
             verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
             verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
             verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
-
         }
 
         @Test
@@ -339,7 +338,7 @@ class AuthControllerTest {
 
             every {
                 userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
-            }  just runs
+            } just runs
 
             // WHEN
             assertDoesNotThrow {

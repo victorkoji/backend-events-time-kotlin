@@ -1,7 +1,5 @@
 package io.eventstime.service
 
-import io.eventstime.exception.AuthErrorType
-import io.eventstime.exception.CustomException
 import io.eventstime.model.*
 import io.eventstime.repository.UserTokenRepository
 import io.mockk.*
@@ -12,9 +10,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.test.context.ActiveProfiles
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 
 @ActiveProfiles("test")
 @ExtendWith(MockKExtension::class)

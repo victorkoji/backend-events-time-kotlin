@@ -81,7 +81,7 @@ class AuthController(
 
         val refreshToken = tokenService.createRefreshToken(user, appClient)
 
-        try  {
+        try {
             userTokenService.updateRefreshToken(user, appClient, refreshToken)
         } catch (e: Exception) {
             throw CustomException(AuthErrorType.UNAUTHORIZED)
