@@ -29,10 +29,8 @@ class AuthController(
 ) {
     @PostMapping("/login")
     fun login(@RequestBody payload: LoginRequest): AuthResponse {
-        AppClient.values().any { appClient ->
-            appClient.name == payload.appClient
-        }.let { exists ->
-            if (!exists) throw CustomException(AuthErrorType.APP_CLIENT_UNDEFINED)
+        if (AppClient.values().none { it.name == payload.appClient }) {
+            throw CustomException(AuthErrorType.APP_CLIENT_UNDEFINED)
         }
 
         val user = userService.findByEmail(payload.email) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
@@ -87,8 +85,10 @@ class AuthController(
             throw CustomException(AuthErrorType.UNAUTHORIZED)
         }
 
+        val accessToken = tokenService.createAccessToken(user, appClient)
+
         return AuthResponse(
-            tokenService.createAccessToken(user, appClient),
+            accessToken,
             refreshToken
         )
     }
