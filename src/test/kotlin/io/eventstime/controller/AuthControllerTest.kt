@@ -46,14 +46,6 @@ class AuthControllerTest {
         userGroup = UserGroup(id = 1, name = "admin")
     )
 
-    private val userToken = UserToken(
-        id = 1,
-        refreshToken = "refresh_token",
-        tokenFcm = null,
-        appClient = AppClient.CLIENT,
-        user = user
-    )
-
     private val userAuth = UserAuth(
         id = 1,
         firstName = "test",

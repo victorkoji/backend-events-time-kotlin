@@ -8,7 +8,6 @@ import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.security.oauth2.jwt.*
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
