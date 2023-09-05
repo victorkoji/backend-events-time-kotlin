@@ -14,4 +14,8 @@ class CustomException(
     constructor(
         errorType: UserGroupErrorType
     ) : this(errorType.name)
+
+    constructor(
+        errorType: EventErrorType
+    ) : this(errorType.name)
 }
