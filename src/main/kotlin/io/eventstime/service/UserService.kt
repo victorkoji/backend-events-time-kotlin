@@ -9,6 +9,7 @@ import io.eventstime.repository.UserRepository
 import io.eventstime.utils.HashUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -37,7 +38,7 @@ class UserService(
         val userGroup = userGroupService.findById(user.userGroupId)
             ?: throw CustomException(UserGroupErrorType.GROUP_NOT_FOUND)
 
-        return userRepository.save(
+        return userRepository.saveAndFlush(
             User(
                 firstName = user.firstName,
                 lastName = user.firstName,
@@ -47,8 +48,8 @@ class UserService(
                 password = hashUtils.createHashBcrypt(user.password),
                 tokenFcm = "",
                 userGroup = userGroup,
-                createdAt = Date(),
-                updatedAt = Date()
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
             )
         )
     }
@@ -57,25 +58,23 @@ class UserService(
         val userGroup = userGroupService.findById(newUser.userGroupId)
             ?: throw CustomException(UserGroupErrorType.GROUP_NOT_FOUND)
 
-        val user = findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
-
-        val updatedUser = user.copy(
+        val updatedUser = findById(userId)?.copy(
             id = userId,
             firstName = newUser.firstName,
             lastName = newUser.firstName,
             birthDate = newUser.birthDate,
             email = newUser.email,
             cellphone = newUser.cellphone,
-            updatedAt = Date(),
+            updatedAt = LocalDateTime.now(),
             userGroup = userGroup
-        )
+        ) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
 
-        return userRepository.save(updatedUser)
+        return userRepository.saveAndFlush(updatedUser)
     }
 
     fun deleteUser(userId: Long) {
-        val user = findById(userId) ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
-        val deletedUser = user.copy(deletedAt = Date())
-        userRepository.save(deletedUser)
+        findById(userId)?.let { user ->
+            userRepository.delete(user)
+        } ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
     }
 }

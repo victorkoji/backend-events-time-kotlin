@@ -86,6 +86,6 @@ class AuthController(
     }
 
     companion object {
-        val log = LoggerFactory.getLogger(AuthController::class.java)!!
+        private val log = LoggerFactory.getLogger(AuthController::class.java)
     }
 }
