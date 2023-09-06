@@ -18,4 +18,8 @@ class CustomException(
     constructor(
         errorType: EventErrorType
     ) : this(errorType.name)
+
+    constructor(
+        errorType: StandCategoryErrorType
+    ) : this(errorType.name)
 }
