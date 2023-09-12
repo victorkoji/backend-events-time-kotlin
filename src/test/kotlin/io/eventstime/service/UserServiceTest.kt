@@ -37,7 +37,6 @@ class UserServiceTest {
         email = "teste@gmail.com",
         cellphone = "123123",
         password = "password",
-        tokenFcm = "",
         userGroup = UserGroup(id = 1, name = "group-test")
     )
 
@@ -178,7 +177,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
         val passwordEncrypted = "password-encrypt"
@@ -213,7 +211,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
 
@@ -244,7 +241,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
 
@@ -278,7 +274,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
 
@@ -312,7 +307,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
 
@@ -338,7 +332,6 @@ class UserServiceTest {
             email = user.email,
             cellphone = user.cellphone,
             password = user.password,
-            tokenFcm = user.tokenFcm,
             userGroupId = 1
         )
 
