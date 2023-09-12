@@ -14,4 +14,16 @@ class CustomException(
     constructor(
         errorType: UserGroupErrorType
     ) : this(errorType.name)
+
+    constructor(
+        errorType: EventErrorType
+    ) : this(errorType.name)
+
+    constructor(
+        errorType: StandCategoryErrorType
+    ) : this(errorType.name)
+
+    constructor(
+        errorType: StandErrorType
+    ) : this(errorType.name)
 }

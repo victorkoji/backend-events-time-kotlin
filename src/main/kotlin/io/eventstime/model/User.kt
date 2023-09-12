@@ -11,10 +11,11 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import jakarta.persistence.Temporal
 import jakarta.persistence.TemporalType
+import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
 import java.time.LocalDateTime
-import java.util.Date
 
 @Entity
 @Table(name = "users", schema = "public")
@@ -32,15 +33,15 @@ data class User(
     val cellphone: String,
     val password: String,
 
-    @Temporal(TemporalType.TIMESTAMP)
-    val createdAt: Date? = null,
+    @CreationTimestamp
+    val createdAt: LocalDateTime? = null,
 
-    @Temporal(TemporalType.TIMESTAMP)
-    val updatedAt: Date? = null,
+    @UpdateTimestamp
+    val updatedAt: LocalDateTime? = null,
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = true)
-    val deletedAt: Date? = null,
+    val deletedAt: LocalDateTime? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_group_id")
