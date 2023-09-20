@@ -31,6 +31,12 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("org.modelmapper:modelmapper:3.1.1")
 
+    // AWS
+    implementation("io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config")
+    implementation("io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config")
+    implementation(platform("software.amazon.awssdk:bom:2.20.86"))
+    implementation("software.amazon.awssdk:s3")
+
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
@@ -48,6 +54,14 @@ dependencies {
 	testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
+
+
+dependencyManagement {
+    imports {
+        mavenBom("io.awspring.cloud:spring-cloud-aws-dependencies:2.4.4")
+    }
+}
+
 
 kotlinter {
 	ignoreFailures = false

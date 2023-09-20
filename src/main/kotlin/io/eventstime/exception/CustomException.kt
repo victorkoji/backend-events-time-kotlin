@@ -26,4 +26,16 @@ class CustomException(
     constructor(
         errorType: StandErrorType
     ) : this(errorType.name)
+
+    constructor(
+        errorType: ProductCategoryErrorType
+    ) : this(errorType.name)
+
+    constructor(
+        errorType: ProductFileErrorType
+    ) : this(errorType.name)
+
+    constructor(
+        errorType: ProductErrorType
+    ) : this(errorType.name)
 }
