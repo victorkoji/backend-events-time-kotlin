@@ -31,8 +31,8 @@ services:
           aws configure list --profile=localstack
 
           echo "########### Creating BUCKET ###########"
-          aws --endpoint-url=http://localstack:4566 s3 mb s3://m7-di-config-local --profile=localstack
-          aws --endpoint-url=http://localstack:4566 s3api put-bucket-acl --bucket m7-di-config-local --acl public-read --profile=localstack
+          aws --endpoint-url=http://localstack:4566 s3 mb s3://events-time-local --profile=localstack
+          aws --endpoint-url=http://localstack:4566 s3api put-bucket-acl --bucket events-time-local --acl public-read --profile=localstack
 
           echo "########### Listing Buckets ###########"
           aws --endpoint-url=http://localstack:4566 s3 ls --profile=localstack

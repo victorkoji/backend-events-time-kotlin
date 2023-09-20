@@ -54,6 +54,18 @@ spring:
         plan_cache_max_size: 16
         plan_parameter_metadata_max_size: 128
 
+  ## MULTIPART (MultipartProperties)
+  servlet:
+    multipart:
+      # Enable multipart uploads
+      enabled: true
+      # Threshold after which files are written to disk.
+      file-size-threshold: 2KB
+      # Max file size.
+      max-file-size: 200MB
+      # Max Request Size
+      max-request-size: 215MB
+
   #
   # Liquibase Support
   #
@@ -61,6 +73,14 @@ spring:
     change-log: classpath:db/liquibase-include-all.yaml
     database-change-log-table: liq_db_changelog
     database-change-log-lock-table: liq_db_changelog_lock
+
+cloud:
+  aws:
+    region.static: us-east-1
+    s3.endpoint: http://s3.localhost.localstack.cloud:4566
+    credentials:
+      access-key: test
+      secret-key: test
 
 server:
   error:
@@ -80,6 +100,11 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+
+events-time:
+  ## File Storage Properties
+  s3:
+    bucket: events-time-local
 
 # Log configuration
 #

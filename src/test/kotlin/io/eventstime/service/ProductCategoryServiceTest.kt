@@ -3,12 +3,10 @@ package io.eventstime.service
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.EventErrorType
 import io.eventstime.exception.ProductCategoryErrorType
-import io.eventstime.exception.StandCategoryErrorType
 import io.eventstime.model.Event
 import io.eventstime.model.ProductCategory
 import io.eventstime.repository.ProductCategoryRepository
 import io.eventstime.schema.ProductCategoryRequest
-import io.eventstime.schema.StandCategoryRequest
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension

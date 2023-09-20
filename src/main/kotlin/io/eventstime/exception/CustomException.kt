@@ -30,4 +30,12 @@ class CustomException(
     constructor(
         errorType: ProductCategoryErrorType
     ) : this(errorType.name)
+
+    constructor(
+        errorType: ProductFileErrorType
+    ) : this(errorType.name)
+
+    constructor(
+        errorType: ProductErrorType
+    ) : this(errorType.name)
 }

@@ -1,10 +1,10 @@
 CONTAINER_NAME_POSTGREE=postgres
 
 up:
-	cd ./docker-compose && docker compose -f database.yml up -d
+	cd ./docker-compose && docker compose -f database.yml -f localstack.yml up -d
 
 down:
-	cd ./docker-compose && docker compose -f database.yml down --remove-orphans
+	cd ./docker-compose && docker compose -f database.yml -f localstack.yml down --remove-orphans
 
 kafka-topics-list:
 	docker exec broker bash -c "kafka-topics --list --bootstrap-server broker:29092"
