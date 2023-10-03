@@ -3,6 +3,7 @@ package io.eventstime.service
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.EventErrorType
 import io.eventstime.exception.ProductCategoryErrorType
+import io.eventstime.model.MenuCategory
 import io.eventstime.model.ProductCategory
 import io.eventstime.repository.ProductCategoryRepository
 import io.eventstime.schema.ProductCategoryRequest
@@ -20,6 +21,19 @@ class ProductCategoryService(
 
     fun findById(productCategoryId: Long): ProductCategory? {
         return productCategoryRepository.findByIdOrNull(productCategoryId)
+    }
+
+    fun findMenuByEventId(eventId: Long): List<MenuCategory> {
+        val categories = productCategoryRepository.findAllByEventIdOrderByNameAsc(eventId)
+
+        return categories.map {
+            MenuCategory(
+                id = it.id!!,
+                name = it.name,
+                eventId = it.event?.id!!,
+                products = it.products.orEmpty()
+            )
+        }
     }
 
     fun createProductCategory(productCategory: ProductCategoryRequest): ProductCategory {

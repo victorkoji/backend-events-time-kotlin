@@ -22,6 +22,9 @@ data class ProductCategory(
     @JoinColumn(name = "event_id")
     val event: Event? = null,
 
+    @OneToMany(mappedBy = "productCategory")
+    val products: List<Product>? = null,
+
     @CreationTimestamp
     val createdAt: LocalDateTime? = null,
 

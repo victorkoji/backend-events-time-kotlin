@@ -15,14 +15,6 @@ fun List<Stand?>.toResponse(): List<StandResponse> {
     return if (this.isEmpty()) {
         emptyList()
     } else {
-        this.map { stand ->
-            StandResponse(
-                id = stand?.id!!,
-                name = stand.name,
-                isCashier = stand.isCashier,
-                eventId = stand.event?.id!!,
-                standCategoryId = stand.standCategory?.id!!
-            )
-        }
+        this.map { it!!.toResponse() }
     }
 }
