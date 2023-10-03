@@ -3,8 +3,7 @@ package io.eventstime.service
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.EventErrorType
 import io.eventstime.exception.ProductCategoryErrorType
-import io.eventstime.model.Event
-import io.eventstime.model.ProductCategory
+import io.eventstime.model.*
 import io.eventstime.repository.ProductCategoryRepository
 import io.eventstime.schema.ProductCategoryRequest
 import io.mockk.*
@@ -102,6 +101,77 @@ class ProductCategoryServiceTest {
         // THEN
         assertNull(result)
         verify(exactly = 1) { productCategoryRepository.findById(productCategoryId) }
+    }
+
+    @Test
+    fun `Find menu by event id with success`() {
+        // GIVEN
+        val product = Product(
+            id = 1,
+            name = "product-1",
+            price = 2F,
+            customFormTemplate = null,
+            productCategory = ProductCategory(
+                id = 1,
+                name = "product category"
+            ),
+            stand = Stand(
+                id = 1,
+                name = "stand",
+                isCashier = true
+            )
+        )
+
+        every {
+            productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!)
+        } returns listOf(
+            productCategory.copy(
+                products = listOf(product)
+            )
+        )
+
+        // WHEN
+        val result = testObject.findMenuByEventId(productCategory.event?.id!!)
+
+        // THEN
+        assertEquals(
+            listOf(MenuCategory(id = 1, name = "event-1", eventId = 1, products = listOf(product))),
+            result
+        )
+        verify(exactly = 1) { productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!) }
+    }
+
+    @Test
+    fun `Find menu by event id returns empty list products`() {
+        // GIVEN
+        every {
+            productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!)
+        } returns listOf(productCategory)
+
+        // WHEN
+        val result = testObject.findMenuByEventId(productCategory.event?.id!!)
+
+        // THEN
+        assertEquals(
+            listOf(MenuCategory(id = 1, name = "event-1", eventId = 1, products = emptyList())),
+            result
+        )
+        verify(exactly = 1) { productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!) }
+    }
+
+    @Test
+    fun `Find menu by event id returns empty list`() {
+        // GIVEN
+        every {
+            productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!)
+        } returns emptyList()
+
+        // WHEN
+        val result = testObject.findMenuByEventId(productCategory.event?.id!!)
+
+        // THEN
+        assertEquals(emptyList<MenuCategory>(), result)
+        verify(exactly = 1) { productCategoryRepository.findAllByEventIdOrderByNameAsc(productCategory.event?.id!!) }
     }
 
     @Test

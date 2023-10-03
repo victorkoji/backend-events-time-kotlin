@@ -17,16 +17,6 @@ fun List<User?>.toResponse(): List<UserResponse> {
     return if (this.isEmpty()) {
         emptyList()
     } else {
-        this.map { user ->
-            UserResponse(
-                id = user?.id!!,
-                firstName = user.firstName,
-                lastName = user.lastName,
-                birthDate = user.birthDate,
-                email = user.email,
-                cellphone = user.cellphone,
-                userGroupId = user.userGroup!!.id
-            )
-        }
+        this.map { it!!.toResponse() }
     }
 }

@@ -13,12 +13,6 @@ fun List<StandCategory?>.toResponse(): List<StandCategoryResponse> {
     return if (this.isEmpty()) {
         emptyList()
     } else {
-        this.map { event ->
-            StandCategoryResponse(
-                id = event?.id!!,
-                name = event.name,
-                eventId = event.id
-            )
-        }
+        this.map { it!!.toResponse() }
     }
 }

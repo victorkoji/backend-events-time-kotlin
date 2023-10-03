@@ -16,15 +16,6 @@ fun List<Event?>.toResponse(): List<EventResponse> {
     return if (this.isEmpty()) {
         emptyList()
     } else {
-        this.map { event ->
-            EventResponse(
-                id = event?.id!!,
-                name = event.name,
-                address = event.address,
-                isPublic = event.isPublic,
-                programmedDateInitial = event.programmedDateInitial,
-                programmedDateFinal = event.programmedDateFinal
-            )
-        }
+        this.map { it!!.toResponse() }
     }
 }
