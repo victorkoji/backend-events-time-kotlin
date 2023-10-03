@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  spring-boot-app:
+    container_name: events-time-app
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - m7-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/events_time
+    healthcheck:
+      test: "curl --fail --silent localhost:5000/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:13-alpine
+    networks:
+      - m7-network
+    hostname: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=events_time
+      - TZ=UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - $HOME/docker/volumes/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-init:
+    image: postgres:13-alpine
+    networks:
+      - m7-network
+    environment:
+      - DATASOURCE_URL=postgres
+      - PGPASSWORD=postgres
+    depends_on:
+      - spring-boot-app
+      - postgres
+    volumes:
+      - ../src/main/resources/db/seed/initial_load.sql:/tmp/initial_load.sql
+    command: bash -c "sleep 20 && psql -h $$DATASOURCE_URL -U postgres -d events_time -f /tmp/initial_load.sql"
+
+networks:
+  m7-network:
+    driver: bridge
