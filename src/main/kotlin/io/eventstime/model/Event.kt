@@ -33,6 +33,9 @@ data class Event(
     @Column(nullable = true)
     val programmedDateFinal: LocalDate,
 
+    @OneToMany(mappedBy = "event")
+    val stands: List<Stand>? = null,
+
     @CreationTimestamp
     val createdAt: LocalDateTime? = null,
 
