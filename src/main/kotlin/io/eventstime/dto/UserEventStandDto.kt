@@ -1,12 +1,10 @@
-package io.eventstime.schema
+package io.eventstime.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.eventstime.model.Stand
 import java.time.LocalDate
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
-data class EventResponse(
+data class UserEventStandDto(
     val id: Long,
     val name: String,
     val address: String?,
@@ -20,5 +18,5 @@ data class EventResponse(
     @JsonProperty("programmed_date_final")
     val programmedDateFinal: LocalDate,
 
-    val stands: List<StandResponse>? = null
+    val stands: List<Stand>? = null
 )

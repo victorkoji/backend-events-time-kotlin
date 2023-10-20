@@ -9,31 +9,31 @@
 --  CONSTRAINT roles_pkey PRIMARY KEY (id)
 --);
 
-CREATE TABLE public.payment_methods (
+CREATE TABLE IF NOT EXISTS public.payment_methods (
 	id serial4 NOT NULL,
 	"name" varchar(50) NOT NULL,
 	CONSTRAINT payment_methods_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.status_charges (
+CREATE TABLE IF NOT EXISTS public.status_charges (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	CONSTRAINT status_charges_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.status_stand_orders (
+CREATE TABLE IF NOT EXISTS public.status_stand_orders (
 	id serial4 NOT NULL,
 	"name" varchar(50) NOT NULL,
 	CONSTRAINT status_stand_orders_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.status_vouchers (
+CREATE TABLE IF NOT EXISTS public.status_vouchers (
 	id serial4 NOT NULL,
 	"name" varchar(50) NOT NULL,
 	CONSTRAINT status_vouchers_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.user_groups (
+CREATE TABLE IF NOT EXISTS public.user_groups (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	created_at timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -42,7 +42,7 @@ CREATE TABLE public.user_groups (
 	CONSTRAINT user_groups_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
 	id serial4 NOT NULL,
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NULL,
@@ -71,7 +71,7 @@ CREATE TABLE public.users (
 --  CONSTRAINT user_roles_role_id_foreign FOREIGN KEY (role_id) REFERENCES public.roles(id)
 --);
 
-CREATE TABLE public.user_tokens (
+CREATE TABLE IF NOT EXISTS public.user_tokens (
 	id serial4 NOT NULL,
 	app_client varchar(50) NOT NULL,
 	user_id int4 NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE public.user_tokens (
 	CONSTRAINT user_tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.events (
+CREATE TABLE IF NOT EXISTS public.events (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	programmed_date_initial date NULL,
@@ -98,7 +98,7 @@ CREATE TABLE public.events (
 	CONSTRAINT events_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.product_categories (
+CREATE TABLE IF NOT EXISTS public.product_categories (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	event_id int4 NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE public.product_categories (
 	CONSTRAINT product_categories_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.product_files (
+CREATE TABLE IF NOT EXISTS public.product_files (
 	id serial4 NOT NULL,
 	filename varchar(255) NOT NULL,
 	filename_original varchar(255) NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE public.product_files (
 	CONSTRAINT product_files_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.stand_categories (
+CREATE TABLE IF NOT EXISTS public.stand_categories (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	event_id int4 NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE public.stand_categories (
 	CONSTRAINT stand_categories_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.stands (
+CREATE TABLE IF NOT EXISTS public.stands (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	is_cashier bool NOT NULL DEFAULT false,
@@ -162,7 +162,7 @@ CREATE TABLE public.stands (
 	CONSTRAINT stands_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.user_event_stands (
+CREATE TABLE IF NOT EXISTS public.user_event_stands (
 	user_id int4 NOT NULL,
 	event_id int4 NOT NULL,
 	stand_id int4 NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE public.user_event_stands (
 );
 
 
-CREATE TABLE public.buyouts (
+CREATE TABLE IF NOT EXISTS public.buyouts (
 	id serial4 NOT NULL,
 	total_amount float8 NOT NULL,
 	approved bool NOT NULL,
@@ -197,7 +197,7 @@ CREATE TABLE public.buyouts (
 	CONSTRAINT buyouts_user_owner_foreign FOREIGN KEY (user_owner) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.charges (
+CREATE TABLE IF NOT EXISTS public.charges (
 	id serial4 NOT NULL,
 	buyout_id int4 NULL,
 	payment_method_id int4 NULL,
@@ -213,7 +213,7 @@ CREATE TABLE public.charges (
 	CONSTRAINT charges_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
 	id serial4 NOT NULL,
 	"name" varchar(255) NOT NULL,
 	price float8 NOT NULL,
@@ -234,7 +234,7 @@ CREATE TABLE public.products (
 	CONSTRAINT products_user_modified_foreign FOREIGN KEY (user_modified) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.stand_orders (
+CREATE TABLE IF NOT EXISTS public.stand_orders (
 	id serial4 NOT NULL,
 	total_amount float8 NOT NULL,
 	num_order int4 NOT NULL,
@@ -248,7 +248,7 @@ CREATE TABLE public.stand_orders (
 	CONSTRAINT stand_orders_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.users(id)
 );
 
-CREATE TABLE public.menu (
+CREATE TABLE IF NOT EXISTS public.menu (
 	id serial4 NOT NULL,
 	stand_id int4 NOT NULL,
 	product_id int4 NOT NULL,
@@ -260,7 +260,7 @@ CREATE TABLE public.menu (
 	CONSTRAINT menu_stand_id_foreign FOREIGN KEY (stand_id) REFERENCES public.stands(id)
 );
 
-CREATE TABLE public.stand_order_vouchers (
+CREATE TABLE IF NOT EXISTS public.stand_order_vouchers (
 	id serial4 NOT NULL,
 	stand_order_id int4 NULL,
 	custom_response jsonb NULL,
@@ -271,7 +271,7 @@ CREATE TABLE public.stand_order_vouchers (
 	CONSTRAINT stand_order_vouchers_stand_order_id_foreign FOREIGN KEY (stand_order_id) REFERENCES public.stand_orders(id)
 );
 
-CREATE TABLE public.vouchers (
+CREATE TABLE IF NOT EXISTS public.vouchers (
 	id serial4 NOT NULL,
 	price float8 NOT NULL,
 	buyout_id int4 NULL,

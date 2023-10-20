@@ -1,9 +1,14 @@
 package io.eventstime.controller
 
+import io.eventstime.auth.AuthorizationService
 import io.eventstime.exception.CustomException
+import io.eventstime.exception.EventErrorType
+import io.eventstime.mapper.toEventResponse
 import io.eventstime.mapper.toResponse
+import io.eventstime.schema.EventResponse
 import io.eventstime.schema.MenuResponse
 import io.eventstime.service.ProductCategoryService
+import io.eventstime.service.UserEventStandService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
@@ -16,7 +21,9 @@ import org.springframework.web.server.ResponseStatusException
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Mobile")
 class MobileController(
-    private val productCategoryService: ProductCategoryService
+    private val productCategoryService: ProductCategoryService,
+    private val authorizationService: AuthorizationService,
+    private val userEventStandService: UserEventStandService
 ) {
 
     @GetMapping("/products/menu")
@@ -24,11 +31,24 @@ class MobileController(
         return productCategoryService.findMenuByEventId(eventId).toResponse()
     }
 
+    @GetMapping("/products/events")
+    fun findAllEventsByUser(): List<EventResponse> {
+        val user = authorizationService.getUser()
+        return userEventStandService.findAllEventsByUserId(user.id).toEventResponse()
+    }
+
+    @GetMapping("/products/events/{eventId}")
+    fun findEventByUser(@RequestParam eventId: Long): EventResponse? {
+        val user = authorizationService.getUser()
+        return userEventStandService.findEventByUserId(user.id, eventId)?.toEventResponse()
+    }
+
     @ExceptionHandler
     fun handleException(e: Exception): ResponseStatusException = when (e) {
         is CustomException ->
             ResponseStatusException(
                 when (e.message) {
+                    EventErrorType.EVENT_NOT_FOUND.name -> HttpStatus.NOT_FOUND
                     else -> HttpStatus.BAD_REQUEST
                 },
                 e.message.toString()

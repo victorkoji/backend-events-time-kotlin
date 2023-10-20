@@ -10,8 +10,8 @@ data class StandResponse(
     val isCashier: Boolean,
 
     @JsonProperty("event_id")
-    val eventId: Long,
+    val eventId: Long?,
 
     @JsonProperty("stand_category_id")
-    val standCategoryId: Long
+    val standCategoryId: Long?
 )

@@ -1,10 +1,10 @@
 package io.eventstime.mapper
 
-import io.eventstime.model.Event
+import io.eventstime.dto.UserEventStandDto
 import io.eventstime.schema.EventResponse
 
-fun Event.toResponse() = EventResponse(
-    id = id!!,
+fun UserEventStandDto.toEventResponse() = EventResponse(
+    id = id,
     name = name,
     address = address,
     isPublic = isPublic,
@@ -13,10 +13,10 @@ fun Event.toResponse() = EventResponse(
     stands = stands?.toResponse()
 )
 
-fun List<Event?>.toResponse(): List<EventResponse> {
+fun List<UserEventStandDto?>.toEventResponse(): List<EventResponse> {
     return if (this.isEmpty()) {
         emptyList()
     } else {
-        this.map { it!!.toResponse() }
+        this.map { it!!.toEventResponse() }
     }
 }
