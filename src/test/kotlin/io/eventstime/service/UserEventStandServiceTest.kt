@@ -1,21 +1,14 @@
 package io.eventstime.service
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.eventstime.dto.UserEventStandDto
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.EventErrorType
-import io.eventstime.exception.StandCategoryErrorType
-import io.eventstime.exception.StandErrorType
 import io.eventstime.model.*
-import io.eventstime.repository.StandRepository
 import io.eventstime.repository.UserEventStandRepository
-import io.eventstime.schema.StandRequest
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith

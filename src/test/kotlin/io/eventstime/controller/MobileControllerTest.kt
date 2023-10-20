@@ -200,7 +200,6 @@ class MobileControllerTest {
     @Test
     fun `Find all events by user returns empty list`() {
         // GIVEN
-        val eventId = 1L
         val userId = 1L
 
         every {

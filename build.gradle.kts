@@ -1,3 +1,5 @@
+import com.adarshr.gradle.testlogger.TestLoggerExtension
+import com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD_PARALLEL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -5,6 +7,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.3"
 	id("org.jmailen.kotlinter") version "3.13.0"
 	id("jacoco")
+    id("com.adarshr.test-logger") version "3.2.0"
 	kotlin("jvm") version "1.8.22"
 	kotlin("plugin.spring") version "1.8.22"
 	kotlin("plugin.jpa") version "1.8.22"
@@ -88,6 +91,11 @@ tasks.jacocoTestReport {
 		xml.required.set(true)
 		csv.required.set(false)
 	}
+}
+
+configure<TestLoggerExtension> {
+    theme = STANDARD_PARALLEL
+    showFullStackTraces = true
 }
 
 tasks.getByName<Jar>("jar") {

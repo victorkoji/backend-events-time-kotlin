@@ -151,13 +151,6 @@ class ProductControllerTest {
     @Test
     fun `Upload image in product with success`() {
         // GIVEN
-        val productRequest = ProductRequest(
-            name = product.name,
-            price = 2F,
-            customFormTemplate = null,
-            standId = product.stand?.id!!,
-            productCategoryId = product.productCategory?.id!!
-        )
         val fileName = "example.txt"
         val contentType = "text/plain"
         val content = "Example file contents.".toByteArray()
