@@ -167,7 +167,7 @@ class UserControllerTest {
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
-            userGroupId = user.userGroup?.id!!,
+            userGroupId = user.userGroup?.id!!
         )
 
         every {
@@ -197,7 +197,7 @@ class UserControllerTest {
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
-            userGroupId = user.userGroup?.id!!,
+            userGroupId = user.userGroup?.id!!
         )
 
         // WHEN
