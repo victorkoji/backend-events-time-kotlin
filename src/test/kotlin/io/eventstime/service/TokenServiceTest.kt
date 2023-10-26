@@ -1,9 +1,9 @@
 package io.eventstime.service
 
-import io.eventstime.model.AppClient
 import io.eventstime.model.User
 import io.eventstime.model.UserAuth
 import io.eventstime.model.UserGroup
+import io.eventstime.model.enum.AppClientEnum
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension
@@ -33,7 +33,7 @@ class TokenServiceTest {
     private val accessTokenExpireSeconds: Long = 10
     private val refreshTokenExpireDays: Long = 1
 
-    private val appClientName = AppClient.CLIENT.name
+    private val appClientName = AppClientEnum.CLIENT.name
 
     private val user = User(
         id = 1,
@@ -70,7 +70,7 @@ class TokenServiceTest {
         } returns "teste"
 
         // WHEN
-        val result = testObject.createAccessToken(user, AppClient.CLIENT)
+        val result = testObject.createAccessToken(user, AppClientEnum.CLIENT)
 
         // THEN
         assertEquals(jwt.tokenValue, result)
@@ -99,7 +99,7 @@ class TokenServiceTest {
         } returns "teste"
 
         // WHEN
-        val result = testObject.createRefreshToken(user, AppClient.CLIENT)
+        val result = testObject.createRefreshToken(user, AppClientEnum.CLIENT)
 
         // THEN
         assertEquals(jwt.tokenValue, result)
@@ -123,6 +123,10 @@ class TokenServiceTest {
         } returns user.id!!
 
         every {
+            jwtDecoderAccessToken.decode(token).claims["appClient"]
+        } returns AppClientEnum.CLIENT.name
+
+        every {
             userService.findById(1)
         } returns user
 
@@ -131,7 +135,7 @@ class TokenServiceTest {
 
         // THEN
         assertEquals(
-            UserAuth(id = 1, firstName = "test", lastName = "test", email = "test@test.com", userGroupId = 1),
+            UserAuth(id = 1, firstName = "test", lastName = "test", email = "test@test.com", userGroupId = 1, appClient = AppClientEnum.CLIENT),
             result
         )
         verify(exactly = 1) { userService.findById(1) }
@@ -183,7 +187,7 @@ class TokenServiceTest {
         val result = testObject.parseRefreshToken(token)
 
         // THEN
-        assertEquals(Pair(user, AppClient.CLIENT), result)
+        assertEquals(Pair(user, AppClientEnum.CLIENT), result)
         verify(exactly = 1) { userService.findById(user.id!!) }
     }
 

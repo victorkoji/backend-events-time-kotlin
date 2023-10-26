@@ -9,6 +9,7 @@ import io.eventstime.schema.TokenFcmRequest
 import io.eventstime.schema.UserRequest
 import io.eventstime.schema.UserResponse
 import io.eventstime.service.UserService
+import io.eventstime.service.UserTokenService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
@@ -22,7 +23,8 @@ import org.springframework.web.server.ResponseStatusException
 @Tag(name = "Users")
 class UserController(
     private val authorizationService: AuthorizationService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val userTokenService: UserTokenService
 ) {
     @GetMapping("/")
     fun findAllUser(): List<UserResponse?> {
@@ -54,13 +56,13 @@ class UserController(
     @PostMapping("/token-fcm")
     fun insertTokenFcm(@RequestBody tokenFcmRequest: TokenFcmRequest) {
         val userAuth = authorizationService.getUser()
-        userService.insertTokenFcm(userAuth.id, tokenFcmRequest.tokenFcm)
+        userTokenService.insertTokenFcm(userAuth.id, userAuth.appClient, tokenFcmRequest.tokenFcm)
     }
 
     @DeleteMapping("/token-fcm")
     fun deleteTokenFcm() {
         val userAuth = authorizationService.getUser()
-        userService.deleteTokenFcm(userAuth.id)
+        userTokenService.deleteTokenFcm(userAuth.id, userAuth.appClient)
     }
 
     @ExceptionHandler

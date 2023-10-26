@@ -3,6 +3,7 @@ package io.eventstime.auth
 import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.model.UserAuth
+import io.eventstime.model.enum.AppClientEnum
 import io.eventstime.utils.HashUtils
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -25,7 +26,7 @@ class AuthorizationServiceTest {
 
     private val hashUtils = mockk<HashUtils>()
 
-    private val user = UserAuth(1, "firstName", "lastName", "email@teste.com", 1)
+    private val user = UserAuth(1, "firstName", "lastName", "email@teste.com", 1, AppClientEnum.CLIENT)
 
     private fun setUserToken() {
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(

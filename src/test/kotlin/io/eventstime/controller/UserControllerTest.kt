@@ -8,9 +8,11 @@ import io.eventstime.mapper.toResponse
 import io.eventstime.model.User
 import io.eventstime.model.UserAuth
 import io.eventstime.model.UserGroup
+import io.eventstime.model.enum.AppClientEnum
 import io.eventstime.schema.TokenFcmRequest
 import io.eventstime.schema.UserRequest
 import io.eventstime.service.UserService
+import io.eventstime.service.UserTokenService
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension
@@ -30,6 +32,7 @@ class UserControllerTest {
 
     private val userService = mockk<UserService>()
     private val authorizationService = mockk<AuthorizationService>()
+    private val userTokenService = mockk<UserTokenService>()
 
     private val user = User(
         id = 1,
@@ -159,19 +162,21 @@ class UserControllerTest {
     fun `Insert token fcm with success`() {
         // GIVEN
         val tokenFcmRequest = TokenFcmRequest(tokenFcm = "1231231")
-
-        every {
-            authorizationService.getUser()
-        } returns UserAuth(
+        val userAuth = UserAuth(
             id = user.id!!,
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
-            userGroupId = user.userGroup?.id!!
+            userGroupId = user.userGroup?.id!!,
+            appClient = AppClientEnum.CLIENT
         )
 
         every {
-            userService.insertTokenFcm(user.id!!, tokenFcmRequest.tokenFcm)
+            authorizationService.getUser()
+        } returns userAuth
+
+        every {
+            userTokenService.insertTokenFcm(userAuth.id, userAuth.appClient, tokenFcmRequest.tokenFcm)
         } just Runs
 
         // WHEN
@@ -180,14 +185,23 @@ class UserControllerTest {
         }
 
         // THEN
-        verify(exactly = 1) { userService.insertTokenFcm(user.id!!, tokenFcmRequest.tokenFcm) }
+        verify(exactly = 1) { userTokenService.insertTokenFcm(userAuth.id, userAuth.appClient, tokenFcmRequest.tokenFcm) }
     }
 
     @Test
     fun `Delete token fcm with success`() {
         // GIVEN
+        val userAuth = UserAuth(
+            id = user.id!!,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            email = user.email,
+            userGroupId = user.userGroup?.id!!,
+            appClient = AppClientEnum.CLIENT
+        )
+
         every {
-            userService.deleteTokenFcm(user.id!!)
+            userTokenService.deleteTokenFcm(userAuth.id, userAuth.appClient)
         } just Runs
 
         every {
@@ -197,7 +211,8 @@ class UserControllerTest {
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
-            userGroupId = user.userGroup?.id!!
+            userGroupId = user.userGroup?.id!!,
+            appClient = AppClientEnum.CLIENT
         )
 
         // WHEN
@@ -206,7 +221,7 @@ class UserControllerTest {
         }
 
         // THEN
-        verify(exactly = 1) { userService.deleteTokenFcm(user.id!!) }
+        verify(exactly = 1) { userTokenService.deleteTokenFcm(userAuth.id, userAuth.appClient) }
     }
 
     @Nested

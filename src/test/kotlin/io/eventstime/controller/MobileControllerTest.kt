@@ -6,6 +6,7 @@ import io.eventstime.exception.CustomException
 import io.eventstime.mapper.toEventResponse
 import io.eventstime.mapper.toResponse
 import io.eventstime.model.*
+import io.eventstime.model.enum.AppClientEnum
 import io.eventstime.schema.EventResponse
 import io.eventstime.schema.MenuResponse
 import io.eventstime.service.ProductCategoryService
@@ -117,7 +118,8 @@ class MobileControllerTest {
             firstName = "firstName",
             lastName = "lastName",
             email = "email@email.com",
-            userGroupId = 1
+            userGroupId = 1,
+            appClient = AppClientEnum.CLIENT
         )
         every {
             userEventStandService.findAllEventsByUserId(userId)
@@ -183,7 +185,8 @@ class MobileControllerTest {
             firstName = "firstName",
             lastName = "lastName",
             email = "email@email.com",
-            userGroupId = 1
+            userGroupId = 1,
+            appClient = AppClientEnum.CLIENT
         )
         every {
             userEventStandService.findAllEventsByUserId(userId)
@@ -209,7 +212,8 @@ class MobileControllerTest {
             firstName = "firstName",
             lastName = "lastName",
             email = "email@email.com",
-            userGroupId = 1
+            userGroupId = 1,
+            appClient = AppClientEnum.CLIENT
         )
         every {
             userEventStandService.findAllEventsByUserId(userId)
@@ -263,7 +267,8 @@ class MobileControllerTest {
             firstName = "firstName",
             lastName = "lastName",
             email = "email@email.com",
-            userGroupId = 1
+            userGroupId = 1,
+            appClient = AppClientEnum.CLIENT
         )
         every {
             userEventStandService.findEventByUserId(userId, event.id!!)
@@ -290,7 +295,8 @@ class MobileControllerTest {
             firstName = "firstName",
             lastName = "lastName",
             email = "email@email.com",
-            userGroupId = 1
+            userGroupId = 1,
+            appClient = AppClientEnum.CLIENT
         )
         every {
             userEventStandService.findEventByUserId(userId, eventId)

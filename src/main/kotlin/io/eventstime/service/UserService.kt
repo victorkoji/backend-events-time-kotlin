@@ -75,26 +75,4 @@ class UserService(
             userRepository.delete(user)
         } ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
     }
-
-    fun insertTokenFcm(userId: Long, tokenFcm: String) {
-        val user = userRepository.findById(userId)
-            .orElseThrow { CustomException(UserErrorType.USER_NOT_FOUND) }
-
-        val updatedUser = user.copy(
-            tokenFcm = tokenFcm
-        )
-
-        userRepository.saveAndFlush(updatedUser)
-    }
-
-    fun deleteTokenFcm(userId: Long) {
-        val user = userRepository.findById(userId)
-            .orElseThrow { CustomException(UserErrorType.USER_NOT_FOUND) }
-
-        val updatedUser = user.copy(
-            tokenFcm = null
-        )
-
-        userRepository.saveAndFlush(updatedUser)
-    }
 }
