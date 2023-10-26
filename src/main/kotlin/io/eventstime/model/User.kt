@@ -32,6 +32,7 @@ data class User(
     val email: String,
     val cellphone: String,
     val password: String,
+    val tokenFcm: String? = null,
 
     @CreationTimestamp
     val createdAt: LocalDateTime? = null,

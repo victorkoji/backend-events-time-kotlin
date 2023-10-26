@@ -6,11 +6,11 @@ import io.eventstime.exception.UserGroupErrorType
 import io.eventstime.model.User
 import io.eventstime.schema.UserRequest
 import io.eventstime.repository.UserRepository
+import io.eventstime.schema.TokenFcmRequest
 import io.eventstime.utils.HashUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class UserService(
@@ -75,5 +75,27 @@ class UserService(
         findById(userId)?.let { user ->
             userRepository.delete(user)
         } ?: throw CustomException(UserErrorType.USER_NOT_FOUND)
+    }
+
+    fun insertTokenFcm(userId: Long, tokenFcm: String){
+        val user = userRepository.findById(userId)
+            .orElseThrow{ CustomException(UserErrorType.USER_NOT_FOUND) }
+
+        val updatedUser = user.copy(
+            tokenFcm = tokenFcm
+        )
+
+        userRepository.saveAndFlush(updatedUser)
+    }
+
+    fun deleteTokenFcm(userId: Long){
+        val user = userRepository.findById(userId)
+            .orElseThrow{ CustomException(UserErrorType.USER_NOT_FOUND) }
+
+        val updatedUser = user.copy(
+            tokenFcm = null
+        )
+
+        userRepository.saveAndFlush(updatedUser)
     }
 }

@@ -1,10 +1,14 @@
 package io.eventstime.controller
 
+import io.eventstime.auth.AuthorizationService
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
 import io.eventstime.exception.UserGroupErrorType
+import io.eventstime.mapper.toResponse
 import io.eventstime.model.User
+import io.eventstime.model.UserAuth
 import io.eventstime.model.UserGroup
+import io.eventstime.schema.TokenFcmRequest
 import io.eventstime.schema.UserRequest
 import io.eventstime.service.UserService
 import io.mockk.*
@@ -25,6 +29,7 @@ class UserControllerTest {
     lateinit var testObject: UserController
 
     private val userService = mockk<UserService>()
+    private val authorizationService = mockk<AuthorizationService>()
 
     private val user = User(
         id = 1,
@@ -65,6 +70,21 @@ class UserControllerTest {
         // THEN
         assertEquals(0, result.size)
         verify(exactly = 1) { userService.findAll() }
+    }
+
+    @Test
+    fun `Find user with success`() {
+        // GIVEN
+        every {
+            userService.findById(user.id!!)
+        } returns user
+
+        // WHEN
+        val result = testObject.findUser(user.id!!)
+
+        // THEN
+        assertEquals(user.toResponse(), result)
+        verify(exactly = 1) { userService.findById(user.id!!) }
     }
 
     @Test
@@ -136,19 +156,57 @@ class UserControllerTest {
     }
 
     @Test
-    fun `Find user with success`() {
+    fun `Insert token fcm with success`() {
         // GIVEN
+        val tokenFcmRequest = TokenFcmRequest(tokenFcm = "1231231")
+
         every {
-            userService.findById(user.id!!)
-        } returns user
+            authorizationService.getUser()
+        } returns UserAuth(
+            id = user.id!!,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            email = user.email,
+            userGroupId = user.userGroup?.id!!,
+        )
+
+        every {
+            userService.insertTokenFcm(user.id!!, tokenFcmRequest.tokenFcm)
+        } just Runs
 
         // WHEN
         assertDoesNotThrow {
-            testObject.findUser(user.id!!)
+            testObject.insertTokenFcm(tokenFcmRequest)
         }
 
         // THEN
-        verify(exactly = 1) { userService.findById(user.id!!) }
+        verify(exactly = 1) { userService.insertTokenFcm(user.id!!, tokenFcmRequest.tokenFcm) }
+    }
+
+    @Test
+    fun `Delete token fcm with success`() {
+        // GIVEN
+        every {
+            userService.deleteTokenFcm(user.id!!)
+        } just Runs
+
+        every {
+            authorizationService.getUser()
+        } returns UserAuth(
+            id = user.id!!,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            email = user.email,
+            userGroupId = user.userGroup?.id!!,
+        )
+
+        // WHEN
+        assertDoesNotThrow {
+            testObject.deleteTokenFcm()
+        }
+
+        // THEN
+        verify(exactly = 1) { userService.deleteTokenFcm(user.id!!) }
     }
 
     @Nested
