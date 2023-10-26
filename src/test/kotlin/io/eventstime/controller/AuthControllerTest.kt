@@ -5,6 +5,7 @@ import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
 import io.eventstime.model.*
+import io.eventstime.model.enum.AppClientEnum
 import io.eventstime.schema.LoginRequest
 import io.eventstime.schema.RefreshTokenRequest
 import io.eventstime.schema.UserRequest
@@ -33,7 +34,7 @@ class AuthControllerTest {
     private val authService = mockk<AuthorizationService>()
     private val userService = mockk<UserService>()
 
-    private val appClientName = AppClient.CLIENT.name
+    private val appClientName = AppClientEnum.CLIENT.name
 
     private val user = User(
         id = 1,
@@ -51,7 +52,8 @@ class AuthControllerTest {
         firstName = "test",
         lastName = "test",
         email = "test@test.com",
-        userGroupId = 1
+        userGroupId = 1,
+        appClient = AppClientEnum.CLIENT
     )
 
     @Nested
@@ -74,15 +76,15 @@ class AuthControllerTest {
             } returns true
 
             every {
-                tokenService.createAccessToken(user, AppClient.CLIENT)
+                tokenService.createAccessToken(user, AppClientEnum.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user, AppClient.CLIENT)
+                tokenService.createRefreshToken(user, AppClientEnum.CLIENT)
             } returns "refresh_token"
 
             every {
-                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+                userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token")
             } just runs
 
             // WHEN
@@ -96,9 +98,9 @@ class AuthControllerTest {
 
             verify(exactly = 1) { userService.findByEmail(payload.email) }
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
-            verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 1) { tokenService.createAccessToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
 
         @Test
@@ -130,7 +132,7 @@ class AuthControllerTest {
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
             verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
-            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
 
         @Test
@@ -154,7 +156,7 @@ class AuthControllerTest {
             verify(exactly = 0) { authService.checkIsValidPassword(payload.password, user.password) }
             verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
-            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
 
         @Test
@@ -175,15 +177,15 @@ class AuthControllerTest {
             } returns true
 
             every {
-                tokenService.createAccessToken(user, AppClient.CLIENT)
+                tokenService.createAccessToken(user, AppClientEnum.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user, AppClient.CLIENT)
+                tokenService.createRefreshToken(user, AppClientEnum.CLIENT)
             } returns "refresh_token"
 
             every {
-                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+                userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token")
             } throws Exception()
 
             // WHEN
@@ -198,7 +200,7 @@ class AuthControllerTest {
             verify(exactly = 1) { authService.checkIsValidPassword(payload.password, user.password) }
             verify(exactly = 1) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 1) { tokenService.createRefreshToken(any(), any()) }
-            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
     }
 
@@ -314,22 +316,22 @@ class AuthControllerTest {
             // GIVEN
             every {
                 tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
-            } returns Pair(user, AppClient.CLIENT)
+            } returns Pair(user, AppClientEnum.CLIENT)
 
             every {
-                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+                userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken)
             } returns true
 
             every {
-                tokenService.createAccessToken(user, AppClient.CLIENT)
+                tokenService.createAccessToken(user, AppClientEnum.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user, AppClient.CLIENT)
+                tokenService.createRefreshToken(user, AppClientEnum.CLIENT)
             } returns "refresh_token"
 
             every {
-                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+                userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token")
             } just runs
 
             // WHEN
@@ -339,10 +341,10 @@ class AuthControllerTest {
 
             // THEN
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
-            verify(exactly = 1) { tokenService.createAccessToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 1) { tokenService.createAccessToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
 
         @Test
@@ -360,10 +362,10 @@ class AuthControllerTest {
             // THEN
             assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 0) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
             verify(exactly = 0) { tokenService.createAccessToken(any(), any()) }
             verify(exactly = 0) { tokenService.createRefreshToken(any(), any()) }
-            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
         }
 
         @Test
@@ -371,10 +373,10 @@ class AuthControllerTest {
             // GIVEN
             every {
                 tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
-            } returns Pair(user, AppClient.CLIENT)
+            } returns Pair(user, AppClientEnum.CLIENT)
 
             every {
-                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+                userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken)
             } returns false
 
             // WHEN
@@ -385,10 +387,10 @@ class AuthControllerTest {
             // THEN
             assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
-            verify(exactly = 0) { tokenService.createAccessToken(user, AppClient.CLIENT) }
-            verify(exactly = 0) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
-            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { tokenService.createAccessToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 0) { tokenService.createRefreshToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 0) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
         }
 
         @Test
@@ -396,22 +398,22 @@ class AuthControllerTest {
             // GIVEN
             every {
                 tokenService.parseRefreshToken(refreshTokenRequest.refreshToken)
-            } returns Pair(user, AppClient.CLIENT)
+            } returns Pair(user, AppClientEnum.CLIENT)
 
             every {
-                userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken)
+                userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken)
             } returns true
 
             every {
-                tokenService.createAccessToken(user, AppClient.CLIENT)
+                tokenService.createAccessToken(user, AppClientEnum.CLIENT)
             } returns "access_token"
 
             every {
-                tokenService.createRefreshToken(user, AppClient.CLIENT)
+                tokenService.createRefreshToken(user, AppClientEnum.CLIENT)
             } returns "refresh_token"
 
             every {
-                userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token")
+                userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token")
             } throws Exception()
 
             // WHEN
@@ -422,10 +424,10 @@ class AuthControllerTest {
             // THEN
             assertEquals(AuthErrorType.UNAUTHORIZED.name, exception.message)
             verify(exactly = 1) { tokenService.parseRefreshToken(refreshTokenRequest.refreshToken) }
-            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClient.CLIENT, refreshTokenRequest.refreshToken) }
-            verify(exactly = 0) { tokenService.createAccessToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClient.CLIENT) }
-            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClient.CLIENT, "refresh_token") }
+            verify(exactly = 1) { userTokenService.validateRefreshToken(user, AppClientEnum.CLIENT, refreshTokenRequest.refreshToken) }
+            verify(exactly = 0) { tokenService.createAccessToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { tokenService.createRefreshToken(user, AppClientEnum.CLIENT) }
+            verify(exactly = 1) { userTokenService.updateRefreshToken(user, AppClientEnum.CLIENT, "refresh_token") }
         }
     }
 

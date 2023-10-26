@@ -16,8 +16,8 @@ data class ProductMenuResponse(
     @JsonProperty("custom_form_template")
     val customFormTemplate: String,
 
-    val stand: StandResponse? = null,
+    @JsonProperty("image_path")
+    val imagePath: String?,
 
-    @JsonProperty("product_file")
-    val productFile: ProductFileSchema? = null
+    val stand: StandResponse? = null
 )

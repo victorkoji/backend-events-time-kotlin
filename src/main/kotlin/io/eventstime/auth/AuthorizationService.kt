@@ -22,7 +22,8 @@ class AuthorizationService(
                     firstName = userToken.firstName,
                     lastName = userToken.lastName,
                     email = userToken.email,
-                    userGroupId = userToken.userGroupId
+                    userGroupId = userToken.userGroupId,
+                    appClient = userToken.appClient
                 )
 
             else -> throw CustomException(AuthErrorType.UNAUTHORIZED)

@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS public.users (
 	birth_date date NULL,
 	cellphone varchar(255) NULL,
 	"password" varchar(255) NOT NULL,
-	token_fcm varchar(255) NULL,
 	user_group_id int4 NULL,
 	user_created int4 NULL,
 	user_modified int4 NULL,

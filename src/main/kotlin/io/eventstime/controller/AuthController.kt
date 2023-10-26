@@ -5,7 +5,7 @@ import io.eventstime.exception.AuthErrorType
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
 import io.eventstime.mapper.toResponse
-import io.eventstime.model.AppClient
+import io.eventstime.model.enum.AppClientEnum
 import io.eventstime.schema.*
 import io.eventstime.service.TokenService
 import io.eventstime.service.UserService
@@ -29,7 +29,7 @@ class AuthController(
 ) {
     @PostMapping("/login")
     fun login(@RequestBody payload: LoginRequest): AuthResponse {
-        if (AppClient.values().none { it.name == payload.appClient }) {
+        if (AppClientEnum.values().none { it.name == payload.appClient }) {
             throw CustomException(AuthErrorType.APP_CLIENT_UNDEFINED)
         }
 
@@ -39,7 +39,7 @@ class AuthController(
             throw CustomException(AuthErrorType.LOGIN_FAILED)
         }
 
-        val appClient: AppClient = AppClient.valueOf(payload.appClient)
+        val appClient: AppClientEnum = AppClientEnum.valueOf(payload.appClient)
         val accessToken = tokenService.createAccessToken(user, appClient)
         val refreshToken = tokenService.createRefreshToken(user, appClient)
 

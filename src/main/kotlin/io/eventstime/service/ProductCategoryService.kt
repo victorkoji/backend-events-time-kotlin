@@ -7,6 +7,7 @@ import io.eventstime.model.MenuCategory
 import io.eventstime.model.ProductCategory
 import io.eventstime.repository.ProductCategoryRepository
 import io.eventstime.schema.ProductCategoryRequest
+import io.eventstime.utils.removeAccents
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -31,7 +32,9 @@ class ProductCategoryService(
                 id = it.id!!,
                 name = it.name,
                 eventId = it.event?.id!!,
-                products = it.products.orEmpty()
+                products = it.products.orEmpty().sortedBy { product ->
+                    product.name.removeAccents()
+                }
             )
         }
     }

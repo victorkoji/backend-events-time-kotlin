@@ -26,19 +26,19 @@ class MobileController(
     private val userEventStandService: UserEventStandService
 ) {
 
-    @GetMapping("/products/menu")
-    fun findProductMenu(@RequestParam eventId: Long): List<MenuResponse> {
+    @GetMapping("/events/{eventId}/menu")
+    fun findProductMenu(@PathVariable eventId: Long): List<MenuResponse> {
         return productCategoryService.findMenuByEventId(eventId).toResponse()
     }
 
-    @GetMapping("/products/events")
+    @GetMapping("/events")
     fun findAllEventsByUser(): List<EventResponse> {
         val user = authorizationService.getUser()
         return userEventStandService.findAllEventsByUserId(user.id).toEventResponse()
     }
 
-    @GetMapping("/products/events/{eventId}")
-    fun findEventByUser(@RequestParam eventId: Long): EventResponse? {
+    @GetMapping("/events/{eventId}")
+    fun findEventByUser(@PathVariable eventId: Long): EventResponse? {
         val user = authorizationService.getUser()
         return userEventStandService.findEventByUserId(user.id, eventId)?.toEventResponse()
     }
