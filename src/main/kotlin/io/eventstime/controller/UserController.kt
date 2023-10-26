@@ -1,9 +1,11 @@
 package io.eventstime.controller
 
+import io.eventstime.auth.AuthorizationService
 import io.eventstime.exception.CustomException
 import io.eventstime.exception.UserErrorType
 import io.eventstime.exception.UserGroupErrorType
 import io.eventstime.mapper.toResponse
+import io.eventstime.schema.TokenFcmRequest
 import io.eventstime.schema.UserRequest
 import io.eventstime.schema.UserResponse
 import io.eventstime.service.UserService
@@ -19,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Users")
 class UserController(
+    private val authorizationService: AuthorizationService,
     private val userService: UserService
 ) {
     @GetMapping("/")
@@ -46,6 +49,18 @@ class UserController(
     @DeleteMapping("/{userId}")
     fun deleteUser(@PathVariable userId: Long) {
         userService.deleteUser(userId)
+    }
+
+    @PostMapping("/token-fcm")
+    fun insertTokenFcm(@RequestBody tokenFcmRequest: TokenFcmRequest) {
+        val userAuth = authorizationService.getUser()
+        userService.insertTokenFcm(userAuth.id, tokenFcmRequest.tokenFcm)
+    }
+
+    @DeleteMapping("/token-fcm")
+    fun deleteTokenFcm() {
+        val userAuth = authorizationService.getUser()
+        userService.deleteTokenFcm(userAuth.id)
     }
 
     @ExceptionHandler

@@ -392,4 +392,77 @@ class UserServiceTest {
         assertEquals(UserErrorType.USER_NOT_FOUND.name, result.message)
         verify(exactly = 0) { userRepository.delete(any()) }
     }
+
+    @Test
+    fun `Insert token fcm with success`() {
+        // GIVEN
+        val tokenFcm = "12345"
+        every {
+            userRepository.findById(user.id!!)
+        } returns Optional.of(user)
+
+        val updatedUser = user.copy(tokenFcm = tokenFcm)
+
+        every {
+            userRepository.saveAndFlush(updatedUser)
+        } returns updatedUser
+
+        // WHEN
+        testObject.insertTokenFcm(user.id!!, tokenFcm)
+
+        // THEN
+        verify(exactly = 1) { userRepository.saveAndFlush(updatedUser) }
+    }
+
+    @Test
+    fun `Insert token fcm with error user not found`() {
+        // GIVEN
+        val tokenFcm = "12345"
+        every {
+            userRepository.findById(user.id!!)
+        } returns Optional.empty()
+
+        // WHEN
+        val result = assertThrows<CustomException> { testObject.insertTokenFcm(user.id!!, tokenFcm) }
+
+        // THEN
+        assertEquals(UserErrorType.USER_NOT_FOUND.name, result.message)
+        verify(exactly = 0) { userRepository.saveAndFlush(any()) }
+    }
+
+    @Test
+    fun `Delete token fcm with success`() {
+        // GIVEN
+        every {
+            userRepository.findById(user.id!!)
+        } returns Optional.of(user)
+
+        val updatedUser = user.copy(tokenFcm = null)
+
+        every {
+            userRepository.saveAndFlush(updatedUser)
+        } returns updatedUser
+
+        // WHEN
+        testObject.deleteTokenFcm(user.id!!)
+
+        // THEN
+        verify(exactly = 1) { userRepository.saveAndFlush(updatedUser) }
+    }
+
+    @Test
+    fun `Delete token fcm with error user not found`() {
+        // GIVEN
+        val tokenFcm = "12345"
+        every {
+            userRepository.findById(user.id!!)
+        } returns Optional.empty()
+
+        // WHEN
+        val result = assertThrows<CustomException> { testObject.deleteTokenFcm(user.id!!) }
+
+        // THEN
+        assertEquals(UserErrorType.USER_NOT_FOUND.name, result.message)
+        verify(exactly = 0) { userRepository.saveAndFlush(any()) }
+    }
 }

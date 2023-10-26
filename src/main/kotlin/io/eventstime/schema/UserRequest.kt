@@ -12,3 +12,7 @@ class UserRequest(
     val password: String,
     @JsonProperty("user_group_id") val userGroupId: Long
 )
+
+data class TokenFcmRequest(
+    val tokenFcm: String
+)

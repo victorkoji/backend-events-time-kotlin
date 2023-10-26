@@ -4,7 +4,7 @@ up:
 	cd ./docker-compose && docker compose -f application.yml -f localstack.yml up -d
 
 down:
-	cd ./docker-compose && docker compose -f application.yml -f database.yml -f localstack.yml down --remove-orphans
+	cd ./docker-compose && docker compose -f application.yml -f database.yml -f localstack.yml down -v --remove-orphans
 
 config:
 	cd ./docker-compose && docker compose -f database.yml -f localstack.yml up -d
