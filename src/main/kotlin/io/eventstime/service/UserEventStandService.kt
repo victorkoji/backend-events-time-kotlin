@@ -6,6 +6,7 @@ import io.eventstime.exception.EventErrorType
 import io.eventstime.model.Stand
 import io.eventstime.model.UserEventStand
 import io.eventstime.repository.UserEventStandRepository
+import io.eventstime.utils.removeAccents
 import org.springframework.stereotype.Service
 
 @Service
@@ -53,7 +54,7 @@ class UserEventStandService(
             isPublic = event.isPublic,
             programmedDateInitial = event.programmedDateInitial,
             programmedDateFinal = event.programmedDateFinal,
-            stands = stands
+            stands = stands.sortedBy { it.name.removeAccents() }
         )
     }
 }

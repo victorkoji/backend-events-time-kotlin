@@ -27,7 +27,7 @@ fun Product.toMenuResponse() = ProductMenuResponse(
     price = price,
     customFormTemplate = customFormTemplate ?: "",
     stand = stand!!.toResponse(),
-    productFile = productFile?.toResponse()
+    imagePath = productFile?.filepath
 )
 
 fun List<Product?>.toMenuResponse(): List<ProductMenuResponse> {

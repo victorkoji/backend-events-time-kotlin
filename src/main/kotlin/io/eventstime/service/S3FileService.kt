@@ -63,6 +63,6 @@ class S3FileService(
     private fun String.toBucketPath() = "$endpointS3/$bucketName/$this"
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(S3FileService::class.java)
+        private val log: Logger = LoggerFactory.getLogger(S3FileService::class.java)
     }
 }
